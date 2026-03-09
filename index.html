@@ -1,0 +1,1248 @@
+!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TuCita | Software médico</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #1a56e8;
+    --primary-dark: #1240b5;
+    --primary-light: #eef3fe;
+    --accent: #00c98d;
+    --accent-dark: #00a873;
+    --dark: #0d1320;
+    --dark-2: #1e293b;
+    --gray: #64748b;
+    --gray-light: #94a3b8;
+    --border: #e2e8f0;
+    --bg: #f8faff;
+    --white: #ffffff;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; color: var(--dark); background: var(--white); }
+  h1,h2,h3,h4 { font-family: 'Sora', sans-serif; }
+
+  /* NAV */
+  nav {
+    position: fixed; top:0; left:0; right:0; z-index:999;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 5%;
+  }
+  .nav-inner {
+    max-width: 1200px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 68px;
+  }
+  .logo {
+    font-family: 'Sora', sans-serif;
+    font-weight: 800; font-size: 1.6rem;
+    color: var(--primary);
+    text-decoration: none;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .logo-icon {
+    width: 36px; height: 36px; background: var(--primary);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo-icon svg { width:20px; height:20px; }
+  .nav-links { display:flex; align-items:center; gap:2rem; }
+  .nav-links a {
+    text-decoration:none; color:var(--dark); font-size:0.95rem; font-weight:500;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--primary); }
+  .nav-actions { display:flex; align-items:center; gap:1rem; }
+  .btn-ghost {
+    background:none; border:none; padding:0.5rem 1rem;
+    color:var(--primary); font-weight:600; cursor:pointer;
+    font-size:0.95rem; font-family: 'DM Sans', sans-serif;
+    border-radius:8px; transition: background 0.2s;
+  }
+  .btn-ghost:hover { background: var(--primary-light); }
+  .btn-primary {
+    background: var(--primary); color:#fff;
+    border:none; padding:0.6rem 1.4rem;
+    border-radius:10px; font-weight:600;
+    cursor:pointer; font-size:0.95rem;
+    font-family: 'DM Sans', sans-serif;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+  .btn-accent {
+    background: var(--accent); color:#fff;
+    border:none; padding:0.75rem 2rem;
+    border-radius:12px; font-weight:700;
+    cursor:pointer; font-size:1rem;
+    font-family: 'DM Sans', sans-serif;
+    transition: background 0.2s, transform 0.1s;
+    box-shadow: 0 4px 14px rgba(0,201,141,0.3);
+  }
+  .btn-accent:hover { background: var(--accent-dark); transform: translateY(-2px); }
+  .btn-lg {
+    padding: 0.9rem 2.5rem; font-size: 1.05rem;
+    border-radius: 14px;
+    box-shadow: 0 6px 20px rgba(26,86,232,0.3);
+  }
+
+  /* HERO */
+  .hero {
+    padding: 140px 5% 100px;
+    background: linear-gradient(135deg, #f0f5ff 0%, #fff 50%, #f0fdf9 100%);
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content:'';
+    position:absolute; top:-200px; right:-100px;
+    width:600px; height:600px;
+    background: radial-gradient(circle, rgba(26,86,232,0.08) 0%, transparent 70%);
+    border-radius:50%;
+  }
+  .hero::after {
+    content:'';
+    position:absolute; bottom:-100px; left:-100px;
+    width:400px; height:400px;
+    background: radial-gradient(circle, rgba(0,201,141,0.08) 0%, transparent 70%);
+    border-radius:50%;
+  }
+  .hero-inner {
+    max-width:1200px; margin:0 auto;
+    display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:center;
+  }
+  .hero-badge {
+    display:inline-flex; align-items:center; gap:6px;
+    background: var(--primary-light); color:var(--primary);
+    border-radius:100px; padding:6px 14px;
+    font-size:0.85rem; font-weight:600;
+    margin-bottom:1.5rem;
+  }
+  .hero-badge span { width:8px; height:8px; background:var(--accent); border-radius:50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
+  .hero h1 {
+    font-size: clamp(2.2rem, 4vw, 3.2rem);
+    font-weight: 800; line-height: 1.15;
+    color: var(--dark); margin-bottom:1.5rem;
+  }
+  .hero h1 em { font-style:normal; color:var(--primary); }
+  .hero p {
+    font-size:1.1rem; color:var(--gray);
+    line-height:1.7; margin-bottom:2.5rem;
+    max-width: 520px;
+  }
+  .hero-ctas { display:flex; gap:1rem; flex-wrap:wrap; }
+  .hero-stats {
+    display:flex; gap:2.5rem; margin-top:3rem;
+    padding-top:2rem; border-top:1px solid var(--border);
+  }
+  .stat-item h3 { font-size:1.8rem; font-weight:800; color:var(--primary); }
+  .stat-item p { font-size:0.85rem; color:var(--gray); margin-top:2px; }
+
+  /* DASHBOARD MOCKUP */
+  .dashboard-mockup {
+    background: var(--white);
+    border-radius: 20px;
+    box-shadow: 0 25px 80px rgba(26,86,232,0.15), 0 4px 20px rgba(0,0,0,0.06);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    animation: floatUp 3s ease-in-out infinite alternate;
+  }
+  @keyframes floatUp { from{transform:translateY(0)} to{transform:translateY(-12px)} }
+  .mockup-header {
+    background: var(--primary);
+    padding: 14px 20px;
+    display: flex; align-items: center; gap:10px;
+  }
+  .mockup-dot { width:10px;height:10px;border-radius:50%; }
+  .mockup-title { color:rgba(255,255,255,0.8); font-size:0.85rem; font-weight:500; margin-left:auto; }
+  .mockup-body { padding:20px; }
+  .mockup-calendar {
+    background: var(--bg);
+    border-radius:12px; padding:16px;
+    margin-bottom:16px;
+  }
+  .cal-header {
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:14px;
+  }
+  .cal-header h4 { font-size:0.9rem; color:var(--dark); }
+  .cal-nav { display:flex;gap:4px; }
+  .cal-nav button {
+    background:none;border:1px solid var(--border);
+    width:24px;height:24px;border-radius:6px;cursor:pointer;
+    font-size:0.75rem; color:var(--gray);
+  }
+  .cal-days { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
+  .cal-day {
+    text-align:center; padding:6px 2px;
+    font-size:0.75rem; border-radius:6px; cursor:pointer;
+  }
+  .cal-day.header { color:var(--gray-light); font-weight:600; }
+  .cal-day.active { background:var(--primary); color:#fff; font-weight:700; }
+  .cal-day.today { background:var(--primary-light); color:var(--primary); font-weight:600; }
+  .cal-day.has-event { position:relative; }
+  .cal-day.has-event::after { content:''; position:absolute; bottom:2px;left:50%;transform:translateX(-50%);width:4px;height:4px;background:var(--accent);border-radius:50%; }
+  .cal-day:hover:not(.header) { background:var(--border); }
+  .appointments-list { display:flex; flex-direction:column; gap:8px; }
+  .apt-item {
+    display:flex; align-items:center; gap:10px;
+    background:#fff; border:1px solid var(--border);
+    border-radius:10px; padding:10px 14px;
+  }
+  .apt-dot { width:10px;height:10px;border-radius:50%;flex-shrink:0; }
+  .apt-info { flex:1; }
+  .apt-info strong { font-size:0.85rem; color:var(--dark); display:block; }
+  .apt-info span { font-size:0.75rem; color:var(--gray-light); }
+  .apt-time { font-size:0.8rem; font-weight:600; color:var(--gray); }
+
+  /* FEATURES SECTION */
+  section { padding:100px 5%; }
+  .section-inner { max-width:1200px; margin:0 auto; }
+  .section-tag {
+    display:inline-block;
+    background:var(--primary-light); color:var(--primary);
+    padding:5px 14px; border-radius:100px;
+    font-size:0.82rem; font-weight:600;
+    margin-bottom:1rem;
+  }
+  .section-title {
+    font-size: clamp(1.8rem,3vw,2.6rem);
+    font-weight:800; line-height:1.2;
+    margin-bottom:1rem;
+  }
+  .section-title em { font-style:normal; color:var(--primary); }
+  .section-subtitle { color:var(--gray); font-size:1.05rem; line-height:1.7; max-width:600px; }
+  .section-header { margin-bottom:4rem; }
+
+  .features-grid {
+    display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem;
+  }
+  .feature-card {
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:20px; padding:2rem;
+    transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+    cursor:default;
+  }
+  .feature-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 50px rgba(26,86,232,0.1);
+    border-color: rgba(26,86,232,0.2);
+  }
+  .feature-icon {
+    width:52px; height:52px;
+    border-radius:14px;
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom:1.2rem;
+    font-size:1.5rem;
+  }
+  .feature-card h3 { font-size:1.05rem; font-weight:700; margin-bottom:0.6rem; }
+  .feature-card p { font-size:0.9rem; color:var(--gray); line-height:1.65; }
+
+  /* HOW IT WORKS */
+  .how-bg { background: var(--bg); }
+  .steps-grid {
+    display:grid; grid-template-columns:repeat(4,1fr); gap:2rem;
+    counter-reset:steps;
+  }
+  .step-card {
+    text-align:center; padding:2rem 1rem;
+    counter-increment:steps;
+    position:relative;
+  }
+  .step-card:not(:last-child)::after {
+    content:'';
+    position:absolute; top:30px; right:-1rem;
+    width:2rem; height:2px;
+    background: linear-gradient(90deg, var(--primary), transparent);
+  }
+  .step-num {
+    width:60px; height:60px;
+    background:var(--primary); color:#fff;
+    border-radius:50%; font-size:1.4rem; font-weight:800;
+    display:flex; align-items:center; justify-content:center;
+    margin:0 auto 1.2rem;
+    font-family:'Sora',sans-serif;
+    box-shadow: 0 8px 20px rgba(26,86,232,0.3);
+  }
+  .step-card h3 { font-size:1rem; font-weight:700; margin-bottom:0.6rem; }
+  .step-card p { font-size:0.9rem; color:var(--gray); line-height:1.6; }
+
+  /* PRICING */
+  .pricing-grid {
+    display:grid; grid-template-columns:repeat(3,1fr); gap:2rem;
+    align-items:start;
+  }
+  .price-card {
+    background:#fff; border:2px solid var(--border);
+    border-radius:24px; padding:2.5rem;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .price-card:hover { transform:translateY(-4px); box-shadow:0 16px 40px rgba(0,0,0,0.08); }
+  .price-card.popular {
+    border-color:var(--primary);
+    background:linear-gradient(135deg,var(--primary) 0%,#2563eb 100%);
+    color:#fff;
+    transform:scale(1.04);
+    box-shadow: 0 20px 60px rgba(26,86,232,0.3);
+  }
+  .popular-badge {
+    background:var(--accent); color:#fff;
+    font-size:0.75rem; font-weight:700;
+    padding:4px 12px; border-radius:100px;
+    display:inline-block; margin-bottom:1rem;
+  }
+  .price-name { font-size:1.1rem; font-weight:700; margin-bottom:0.5rem; }
+  .price-amount { font-size:2.8rem; font-weight:800; font-family:'Sora',sans-serif; }
+  .price-amount span { font-size:1rem; font-weight:400; }
+  .price-desc { font-size:0.9rem; margin:0.5rem 0 1.5rem; opacity:0.7; }
+  .price-features { list-style:none; margin-bottom:2rem; display:flex;flex-direction:column;gap:0.7rem; }
+  .price-features li { font-size:0.9rem; display:flex; align-items:center; gap:8px; }
+  .price-features li::before { content:'✓'; font-weight:700; color:var(--accent); flex-shrink:0; }
+  .price-card.popular .price-features li::before { color:#7df5d0; }
+  .btn-outline {
+    background:none; border:2px solid var(--primary); color:var(--primary);
+    padding:0.7rem 1.8rem; border-radius:12px;
+    font-weight:700; cursor:pointer;
+    font-family:'DM Sans',sans-serif; font-size:0.95rem;
+    width:100%; transition: background 0.2s;
+  }
+  .btn-outline:hover { background:var(--primary); color:#fff; }
+  .btn-white {
+    background:#fff; border:none; color:var(--primary);
+    padding:0.7rem 1.8rem; border-radius:12px;
+    font-weight:700; cursor:pointer;
+    font-family:'DM Sans',sans-serif; font-size:0.95rem;
+    width:100%; transition: opacity 0.2s;
+  }
+  .btn-white:hover { opacity:0.9; }
+
+  /* TESTIMONIALS */
+  .testimonials-bg { background: var(--bg); }
+  .testimonials-grid {
+    display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem;
+  }
+  .testi-card {
+    background:#fff; border:1px solid var(--border);
+    border-radius:20px; padding:2rem;
+  }
+  .stars { color:#f59e0b; font-size:0.95rem; margin-bottom:1rem; }
+  .testi-card blockquote { font-size:0.95rem; line-height:1.7; color:var(--dark-2); margin-bottom:1.5rem; }
+  .testi-author { display:flex; align-items:center; gap:12px; }
+  .author-avatar {
+    width:42px;height:42px;border-radius:50%;
+    background:var(--primary-light);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700; color:var(--primary); font-size:0.9rem;
+    font-family:'Sora',sans-serif;
+  }
+  .author-name { font-weight:700; font-size:0.9rem; }
+  .author-role { font-size:0.8rem; color:var(--gray-light); }
+
+  /* CTA BANNER */
+  .cta-banner {
+    background:linear-gradient(135deg,var(--primary) 0%,#2563eb 100%);
+    border-radius:28px; padding:4rem;
+    text-align:center; color:#fff;
+    position:relative; overflow:hidden;
+  }
+  .cta-banner::before {
+    content:''; position:absolute;
+    top:-80px;right:-80px;
+    width:300px;height:300px;
+    background:rgba(255,255,255,0.06);
+    border-radius:50%;
+  }
+  .cta-banner h2 { font-size:clamp(1.8rem,3vw,2.4rem); font-weight:800; margin-bottom:1rem; }
+  .cta-banner p { font-size:1.05rem; opacity:0.85; margin-bottom:2.5rem; }
+  .cta-input-group {
+    display:flex; gap:12px; justify-content:center;
+    flex-wrap:wrap; max-width:520px; margin:0 auto;
+  }
+  .cta-input {
+    flex:1; min-width:220px;
+    padding:0.85rem 1.2rem;
+    border:none; border-radius:12px;
+    font-size:0.95rem; font-family:'DM Sans',sans-serif;
+    outline:none;
+  }
+
+  /* INTEGRATIONS */
+  .integrations-row {
+    display:flex; flex-wrap:wrap; gap:1.2rem;
+    justify-content:center; margin-top:3rem;
+  }
+  .integration-pill {
+    background:#fff; border:1px solid var(--border);
+    border-radius:100px; padding:10px 20px;
+    display:flex; align-items:center; gap:10px;
+    font-size:0.9rem; font-weight:500;
+    transition:box-shadow 0.2s, transform 0.2s;
+  }
+  .integration-pill:hover { box-shadow:0 6px 20px rgba(0,0,0,0.08); transform:translateY(-2px); }
+  .int-logo { font-size:1.2rem; }
+
+  /* FOOTER */
+  footer {
+    background:var(--dark); color:rgba(255,255,255,0.7);
+    padding:70px 5% 40px;
+  }
+  .footer-grid {
+    max-width:1200px; margin:0 auto;
+    display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:3rem;
+    margin-bottom:3rem;
+  }
+  .footer-brand .logo { color:#fff; }
+  .footer-brand p { font-size:0.9rem; line-height:1.7; margin-top:1rem; max-width:280px; }
+  .footer-col h4 { font-family:'Sora',sans-serif; color:#fff; font-size:0.95rem; margin-bottom:1.2rem; }
+  .footer-col ul { list-style:none; display:flex;flex-direction:column;gap:0.6rem; }
+  .footer-col ul li a { color:rgba(255,255,255,0.6); text-decoration:none; font-size:0.9rem; transition:color 0.2s; }
+  .footer-col ul li a:hover { color:#fff; }
+  .footer-bottom {
+    max-width:1200px; margin:0 auto;
+    padding-top:2rem; border-top:1px solid rgba(255,255,255,0.1);
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:0.85rem;
+  }
+
+  /* MODAL DEMO */
+  .modal-overlay {
+    display:none; position:fixed;
+    inset:0; background:rgba(13,19,32,0.6);
+    z-index:9999; align-items:center; justify-content:center;
+    backdrop-filter:blur(4px);
+  }
+  .modal-overlay.active { display:flex; }
+  .modal {
+    background:#fff; border-radius:24px;
+    padding:2.5rem; width:90%; max-width:520px;
+    position:relative;
+    animation: slideIn 0.3s ease;
+  }
+  @keyframes slideIn { from{transform:translateY(30px);opacity:0} to{transform:translateY(0);opacity:1} }
+  .modal-close {
+    position:absolute;top:16px;right:16px;
+    background:none;border:none;font-size:1.5rem;
+    cursor:pointer;color:var(--gray);
+  }
+  .modal h2 { font-size:1.6rem; font-weight:800; margin-bottom:0.5rem; }
+  .modal p { color:var(--gray);margin-bottom:2rem; }
+  .form-group { margin-bottom:1.2rem; }
+  .form-group label { display:block;font-size:0.88rem;font-weight:600;margin-bottom:6px; }
+  .form-group input, .form-group select {
+    width:100%;padding:0.75rem 1rem;
+    border:1px solid var(--border);border-radius:10px;
+    font-size:0.95rem;font-family:'DM Sans',sans-serif;
+    outline:none; transition:border-color 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus { border-color:var(--primary); }
+  .form-row { display:grid;grid-template-columns:1fr 1fr;gap:1rem; }
+
+  /* TABS */
+  .tabs { display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:2rem; }
+  .tab-btn {
+    background:none;border:none;padding:0.8rem 1.5rem;
+    font-size:0.95rem;font-weight:600;cursor:pointer;
+    color:var(--gray);border-bottom:2px solid transparent;
+    margin-bottom:-2px;font-family:'DM Sans',sans-serif;
+    transition:color 0.2s,border-color 0.2s;
+  }
+  .tab-btn.active { color:var(--primary);border-bottom-color:var(--primary); }
+  .tab-content { display:none; }
+  .tab-content.active { display:block; }
+
+  /* STICKY CTA */
+  .sticky-cta {
+    display:none;
+    position:fixed;bottom:24px;right:24px;z-index:500;
+  }
+
+  /* SEARCH / BOOKING */
+  .booking-widget {
+    background:#fff;border:1px solid var(--border);
+    border-radius:20px;padding:2rem;
+    box-shadow:0 10px 40px rgba(0,0,0,0.08);
+  }
+  .specialty-grid {
+    display:grid; grid-template-columns:repeat(4,1fr); gap:1rem;
+    margin-top:2rem;
+  }
+  .specialty-card {
+    text-align:center;padding:1.5rem 1rem;
+    border:1px solid var(--border);border-radius:16px;
+    cursor:pointer;transition:all 0.2s;
+  }
+  .specialty-card:hover { border-color:var(--primary);background:var(--primary-light); }
+  .specialty-card .emoji { font-size:2rem;margin-bottom:0.5rem; }
+  .specialty-card p { font-size:0.85rem;font-weight:600;color:var(--dark); }
+
+  /* SCROLL ANIMATION */
+  .fade-in { opacity:0;transform:translateY(30px);transition:opacity 0.6s,transform 0.6s; }
+  .fade-in.visible { opacity:1;transform:translateY(0); }
+
+  @media(max-width:900px){
+    .hero-inner,.features-grid,.pricing-grid,.testimonials-grid,.steps-grid { grid-template-columns:1fr; }
+    .footer-grid { grid-template-columns:1fr 1fr; }
+    .specialty-grid { grid-template-columns:repeat(2,1fr); }
+    .dashboard-mockup { display:none; }
+    nav .nav-links { display:none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+      </div>
+      TuCita
+    </a>
+    <div class="nav-links">
+      <a href="#funciones">Funciones</a>
+      <a href="#como-funciona">Cómo funciona</a>
+      <a href="#precios">Precios</a>
+      <a href="#integraciones">Integraciones</a>
+      <a href="#testimonios">Testimonios</a>
+    </div>
+    <div class="nav-actions">
+      <button class="btn-ghost" onclick="openModal('login')">Iniciar sesión</button>
+      <button class="btn-primary" onclick="openModal('register')">Empezar gratis</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-content fade-in">
+      <div class="hero-badge"><span></span>Software médico #1 en Chile</div>
+      <h1>Gestión integral para tu <em>centro de salud</em> y estética</h1>
+      <p>Agenda online, ficha clínica, confirmaciones automáticas, pagos, CRM y estadísticas — todo en una sola plataforma.</p>
+      <div class="hero-ctas">
+        <button class="btn-primary btn-lg" onclick="openModal('register')">Prueba gratis 14 días</button>
+        <button class="btn-ghost btn-lg" onclick="openModal('demo')" style="border:2px solid var(--border);">Ver demo</button>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item"><h3>+5.000</h3><p>Centros activos</p></div>
+        <div class="stat-item"><h3>+2M</h3><p>Citas agendadas</p></div>
+        <div class="stat-item"><h3>99.9%</h3><p>Uptime garantizado</p></div>
+      </div>
+    </div>
+    <div class="dashboard-mockup fade-in">
+      <div class="mockup-header">
+        <div class="mockup-dot" style="background:#ff5f57"></div>
+        <div class="mockup-dot" style="background:#febc2e"></div>
+        <div class="mockup-dot" style="background:#28c840"></div>
+        <span class="mockup-title">Agenda · TuCita</span>
+      </div>
+      <div class="mockup-body">
+        <div class="mockup-calendar">
+          <div class="cal-header">
+            <h4>Marzo 2026</h4>
+            <div class="cal-nav"><button>‹</button><button>›</button></div>
+          </div>
+          <div class="cal-days">
+            <div class="cal-day header">Lu</div><div class="cal-day header">Ma</div><div class="cal-day header">Mi</div><div class="cal-day header">Ju</div><div class="cal-day header">Vi</div><div class="cal-day header">Sa</div><div class="cal-day header">Do</div>
+            <div class="cal-day">24</div><div class="cal-day">25</div><div class="cal-day has-event">26</div><div class="cal-day has-event">27</div><div class="cal-day">28</div><div class="cal-day">1</div><div class="cal-day">2</div>
+            <div class="cal-day today">3</div><div class="cal-day has-event">4</div><div class="cal-day">5</div><div class="cal-day has-event">6</div><div class="cal-day active">7</div><div class="cal-day">8</div><div class="cal-day">9</div>
+          </div>
+        </div>
+        <div class="appointments-list">
+          <div class="apt-item"><div class="apt-dot" style="background:#22c55e"></div><div class="apt-info"><strong>María González</strong><span>Medicina General</span></div><div class="apt-time">09:00</div></div>
+          <div class="apt-item"><div class="apt-dot" style="background:#f59e0b"></div><div class="apt-info"><strong>Carlos Ruiz</strong><span>Control nutricional</span></div><div class="apt-time">10:30</div></div>
+          <div class="apt-item"><div class="apt-dot" style="background:#1a56e8"></div><div class="apt-info"><strong>Ana Pérez</strong><span>Psicología</span></div><div class="apt-time">12:00</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="funciones">
+  <div class="section-inner">
+    <div class="section-header fade-in">
+      <div class="section-tag">Funcionalidades</div>
+      <h2 class="section-title">Todo lo que tu centro necesita <em>en un solo lugar</em></h2>
+      <p class="section-subtitle">Desde la agenda hasta las finanzas — simplifica cada proceso de tu clínica con herramientas diseñadas para el equipo de salud.</p>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('agenda',this)">Agenda</button>
+      <button class="tab-btn" onclick="switchTab('clinica',this)">Ficha Clínica</button>
+      <button class="tab-btn" onclick="switchTab('finanzas',this)">Finanzas</button>
+      <button class="tab-btn" onclick="switchTab('marketing',this)">Marketing</button>
+    </div>
+
+    <div id="tab-agenda" class="tab-content active">
+      <div class="features-grid">
+        <div class="feature-card fade-in"><div class="feature-icon" style="background:#eef3fe">📅</div><h3>Agenda online 24/7</h3><p>Tus pacientes pueden agendar citas por internet en cualquier momento del día sin necesidad de llamar.</p></div>
+        <div class="feature-card fade-in"><div class="feature-icon" style="background:#f0fdf4">🔔</div><h3>Recordatorios automáticos</h3><p>Envío de confirmaciones y recordatorios por email y WhatsApp 24 horas antes de la cita.</p></div>
+        <div class="feature-card fade-in"><div class="feature-icon" style="background:#fff7ed">🎨</div><h3>Códigos de color</h3><p>Visualiza el estado de cada cita (confirmada, pendiente, atendida, cancelada) mediante colores intuitivos.</p></div>
+        <div class="feature-card fade-in"><div class="feature-icon" style="background:#fdf4ff">👥</div><h3>Multi-profesional</h3><p>Gestiona la agenda de todos los profesionales de tu centro en una vista centralizada.</p></div>
+        <div class="feature-card fade-in"><div class="feature-icon" style="background:#eff6ff">🖥️</div><h3>Telemedicina</h3><p>Realiza videoconsultas certificadas por FONASA directamente desde la plataforma, sin límite de minutos.</p></div>
+        <div class="feature-card fade-in"><div class="feature-icon" style="background:#f0fdf4">🔄</div><h3>Tiempo real</h3><p>Los cambios en horarios se actualizan al instante y se sincronizan entre todos los dispositivos.</p></div>
+      </div>
+    </div>
+
+    <div id="tab-clinica" class="tab-content">
+      <div class="features-grid">
+        <div class="feature-card fade-in"><div class="feature-icon" style="background:#eef3fe">📋</div><h3>Ficha electrónica</h3><p>Accede rápidamente al historial clínico completo del paciente: diagnósticos, tratamientos y documentos.</p></div>
+        <div class="feature-card fade-in"><div class="feature-icon" style="background:#f0fdf4">💊</div><h3>Recetas electrónicas</h3><p>Emite recetas digitales firmadas y envíalas directamente al paciente por correo electrónico.</p></div>
+        <div class="feature-card fade-in"><div class="feature-icon" style="background:#fff7ed">🔒</div><h3>Datos seguros</h3><p>Almacenamiento en la nube con encriptación y copias de seguridad automáticas para proteger los datos clínicos.</p></div>
+        <div class="feature-card fade-in"><div class="feature-icon" style="background:#fdf4ff">📊</div><h3>Formularios personalizados</h3><p>Diseña formularios clínicos a medida para cada especialidad de tu centro.</p></div>
+        <div class="feature-card fade-in"><div class="feature-icon" style="background:#eff6ff">📁</div><h3>Documentos adjuntos</h3><p>Sube y asocia exámenes, imágenes, informes y cualquier archivo a la ficha del paciente.</p></div>
+        <div class="feature-card fade-in"><div class="feature-icon" style="background:#f0fdf4">✏️</div><h3>Notas de evolución</h3><p>Registra el progreso de cada paciente con notas cronológicas y plantillas predefinidas.</p></div>
+      </div>
+    </div>
+
+    <div id="tab-finanzas" class="tab-content">
+      <div class="features-grid">
+        <div class="feature-card fade-in"><div class="feature-icon" style="background:#eef3fe">💳</div><h3>Pagos online</h3><p>Acepta pagos con tarjeta de crédito, débito y transferencias directamente en la plataforma.</p></div>
+        <div class="feature-card fade-in"><div class="feature-icon" style="background:#f0fdf4">🏦</div><h3>Control de caja</h3><p>Registra ingresos, egresos y genera reportes financieros detallados de tu centro.</p></div>
+        <div class="feature-card fade-in"><div class="feature-icon" style="background:#fff7ed">📈</div><h3>Comisiones automáticas</h3><p>Calcula automáticamente las comisiones de cada profesional según los parámetros configurados.</p></div>
+        <div class="feature-card fade-in"><div class="feature-icon" style="background:#fdf4ff">🎁</div><h3>Gift cards</h3><p>Vende y gestiona gift cards para fidelizar pacientes y atraer nuevos clientes.</p></div>
+        <div class="feature-card fade-in"><div class="feature-icon" style="background:#eff6ff">🧾</div><h3>Boletas y facturas</h3><p>Emite documentos tributarios electrónicos integrados con el SII de forma automática.</p></div>
+        <div class="feature-card fade-in"><div class="feature-icon" style="background:#f0fdf4">📉</div><h3>Estadísticas</h3><p>Dashboards con indicadores clave: ingresos, ocupación, pacientes nuevos y tendencias.</p></div>
+      </div>
+    </div>
+
+    <div id="tab-marketing" class="tab-content">
+      <div class="features-grid">
+        <div class="feature-card fade-in"><div class="feature-icon" style="background:#eef3fe">🌐</div><h3>Página web propia</h3><p>Obtén tu perfil personalizado en miTuCita para capturar nuevos pacientes en línea.</p></div>
+        <div class="feature-card fade-in"><div class="feature-icon" style="background:#f0fdf4">⭐</div><h3>Encuestas de satisfacción</h3><p>Recopila opiniones de tus pacientes automáticamente para mejorar la atención.</p></div>
+        <div class="feature-card fade-in"><div class="feature-icon" style="background:#fff7ed">📱</div><h3>Integración redes sociales</h3><p>Conecta tu agenda directamente con Instagram, Facebook y tu sitio web.</p></div>
+        <div class="feature-card fade-in"><div class="feature-icon" style="background:#fdf4ff">📧</div><h3>Campañas de email</h3><p>Envía comunicaciones masivas personalizadas a tu base de pacientes.</p></div>
+        <div class="feature-card fade-in"><div class="feature-icon" style="background:#eff6ff">💬</div><h3>WhatsApp Business</h3><p>Automatiza mensajes de recordatorio y confirmación vía WhatsApp.</p></div>
+        <div class="feature-card fade-in"><div class="feature-icon" style="background:#f0fdf4">🏷️</div><h3>Programas de fidelización</h3><p>Crea bonos, descuentos y beneficios para retener a tus pacientes frecuentes.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BOOKING DEMO -->
+<section id="agenda-demo" style="background:var(--bg)">
+  <div class="section-inner">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;" class="fade-in">
+      <div>
+        <div class="section-tag">Agenda online</div>
+        <h2 class="section-title">Tus pacientes agendan <em>sin llamar</em></h2>
+        <p style="color:var(--gray);line-height:1.7;margin-bottom:2rem;">Comparte tu link de agendamiento y deja que tus pacientes elijan el horario más conveniente — las 24 horas, desde cualquier dispositivo.</p>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:1rem;">
+          <li style="display:flex;align-items:center;gap:12px;font-size:0.95rem;"><span style="background:var(--primary-light);color:var(--primary);padding:4px 10px;border-radius:6px;font-weight:700;">✓</span>Sin filas telefónicas</li>
+          <li style="display:flex;align-items:center;gap:12px;font-size:0.95rem;"><span style="background:var(--primary-light);color:var(--primary);padding:4px 10px;border-radius:6px;font-weight:700;">✓</span>Confirmación inmediata por email y WhatsApp</li>
+          <li style="display:flex;align-items:center;gap:12px;font-size:0.95rem;"><span style="background:var(--primary-light);color:var(--primary);padding:4px 10px;border-radius:6px;font-weight:700;">✓</span>Reducción de inasistencias hasta en 40%</li>
+          <li style="display:flex;align-items:center;gap:12px;font-size:0.95rem;"><span style="background:var(--primary-light);color:var(--primary);padding:4px 10px;border-radius:6px;font-weight:700;">✓</span>Pago en línea al momento de agendar</li>
+        </ul>
+      </div>
+      <div class="booking-widget" id="booking-widget">
+        <h3 style="font-size:1.1rem;margin-bottom:0.3rem;">Reserva tu hora</h3>
+        <p style="color:var(--gray);font-size:0.9rem;margin-bottom:1.5rem;">Selecciona la especialidad que necesitas</p>
+        <div id="booking-form" style="display:flex;flex-direction:column;gap:1rem;">
+          <div class="form-group">
+            <label>Especialidad</label>
+            <select><option>Medicina General</option><option>Psicología</option><option>Nutriología</option><option>Kinesiología</option><option>Dental</option></select>
+          </div>
+          <div class="form-group">
+            <label>Profesional</label>
+            <select><option>Dr. Mario Soto</option><option>Dra. Carmen López</option><option>Dr. Felipe Vega</option></select>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Fecha</label><input type="date" value="2026-03-07"></div>
+            <div class="form-group"><label>Hora</label>
+              <select><option>09:00</option><option>09:30</option><option>10:00</option><option>10:30</option><option>11:00</option></select>
+            </div>
+          </div>
+          <button id="btn-booking" class="btn-accent" style="width:100%;padding-right:2.5rem;">Confirmar reserva →</button>
+        </div>
+        <div id="booking-success" class="booking-confirmed">
+          <div style="font-size:3rem;margin-bottom:1rem;">🎉</div>
+          <h3 style="font-size:1.2rem;font-weight:800;margin-bottom:0.5rem;">¡Hora confirmada!</h3>
+          <p style="color:var(--gray);font-size:0.9rem;margin-bottom:0.5rem;" id="booking-summary"></p>
+          <p style="color:var(--gray);font-size:0.85rem;margin-bottom:1.5rem;">Te enviamos la confirmación a tu email y WhatsApp.</p>
+          <button id="btn-booking-reset" class="btn-primary" style="border-radius:10px;padding:0.6rem 1.5rem;">Agendar otra hora</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="como-funciona">
+  <div class="section-inner">
+    <div class="section-header fade-in" style="text-align:center;">
+      <div class="section-tag">Cómo funciona</div>
+      <h2 class="section-title">Empieza en <em>minutos</em></h2>
+      <p class="section-subtitle" style="margin:0 auto">Sin instalaciones, sin complicaciones. Tu centro digital listo para operar hoy.</p>
+    </div>
+    <div class="steps-grid fade-in">
+      <div class="step-card"><div class="step-num">1</div><h3>Crea tu cuenta</h3><p>Regístrate gratis en menos de 2 minutos con tu email.</p></div>
+      <div class="step-card"><div class="step-num">2</div><h3>Configura tu centro</h3><p>Agrega profesionales, servicios y define los horarios de atención.</p></div>
+      <div class="step-card"><div class="step-num">3</div><h3>Comparte tu link</h3><p>Publica tu link de agendamiento en redes sociales o tu web.</p></div>
+      <div class="step-card"><div class="step-num">4</div><h3>¡Listo!</h3><p>Recibe citas automáticamente y gestiona todo desde un panel único.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- INTEGRATIONS -->
+<section id="integraciones" style="background:var(--bg)">
+  <div class="section-inner">
+    <div class="section-header fade-in" style="text-align:center;">
+      <div class="section-tag">Integraciones</div>
+      <h2 class="section-title">Conecta con tus <em>herramientas favoritas</em></h2>
+      <p class="section-subtitle" style="margin:0 auto">TuCita se integra con las plataformas que ya usas para una experiencia sin fricciones.</p>
+    </div>
+    <div class="integrations-row fade-in">
+      <div class="integration-pill"><span class="int-logo">💚</span>WhatsApp Business</div>
+      <div class="integration-pill"><span class="int-logo">📧</span>Gmail</div>
+      <div class="integration-pill"><span class="int-logo">📅</span>Google Calendar</div>
+      <div class="integration-pill"><span class="int-logo">💳</span>Webpay / Transbank</div>
+      <div class="integration-pill"><span class="int-logo">📊</span>Google Analytics</div>
+      <div class="integration-pill"><span class="int-logo">📘</span>Facebook / Meta</div>
+      <div class="integration-pill"><span class="int-logo">🏥</span>FONASA</div>
+      <div class="integration-pill"><span class="int-logo">🧾</span>SII Chile</div>
+      <div class="integration-pill"><span class="int-logo">🔵</span>Zapier</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="precios">
+  <div class="section-inner">
+    <div class="section-header fade-in" style="text-align:center;">
+      <div class="section-tag">Precios</div>
+      <h2 class="section-title">Planes para <em>cada tamaño</em> de centro</h2>
+      <p class="section-subtitle" style="margin:0 auto">Comienza gratis. Sin tarjeta de crédito, sin contratos forzosos.</p>
+    </div>
+    <div class="pricing-grid fade-in">
+      <div class="price-card">
+        <div class="price-name">Básico</div>
+        <div class="price-amount">$29.990<span>/mes</span></div>
+        <p class="price-desc">Para consultorios independientes</p>
+        <ul class="price-features">
+          <li>1 profesional</li>
+          <li>Agenda online 24/7</li>
+          <li>Recordatorios por email</li>
+          <li>Ficha clínica básica</li>
+          <li>Página web miTuCita</li>
+          <li>Soporte por chat</li>
+        </ul>
+        <button class="btn-outline" onclick="openModal('register')">Comenzar gratis</button>
+      </div>
+      <div class="price-card popular">
+        <div class="popular-badge">⭐ Más popular</div>
+        <div class="price-name">Profesional</div>
+        <div class="price-amount">$59.990<span>/mes</span></div>
+        <p class="price-desc">Para centros con varios profesionales</p>
+        <ul class="price-features">
+          <li>Hasta 5 profesionales</li>
+          <li>Todo el plan Básico</li>
+          <li>Recordatorios WhatsApp</li>
+          <li>Ficha clínica completa</li>
+          <li>Pagos en línea</li>
+          <li>Telemedicina FONASA</li>
+          <li>Comisiones automáticas</li>
+          <li>Estadísticas avanzadas</li>
+        </ul>
+        <button class="btn-white" onclick="openModal('register')">Comenzar gratis</button>
+      </div>
+      <div class="price-card">
+        <div class="price-name">Enterprise</div>
+        <div class="price-amount">$99.990<span>/mes</span></div>
+        <p class="price-desc">Para clínicas y redes de centros</p>
+        <ul class="price-features">
+          <li>Profesionales ilimitados</li>
+          <li>Todo el plan Profesional</li>
+          <li>Multi-sucursal</li>
+          <li>API personalizada</li>
+          <li>Facturación electrónica</li>
+          <li>Onboarding dedicado</li>
+          <li>SLA 99.9% garantizado</li>
+        </ul>
+        <button class="btn-outline" onclick="openModal('register')">Contactar ventas</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonios" class="testimonials-bg">
+  <div class="section-inner">
+    <div class="section-header fade-in" style="text-align:center;">
+      <div class="section-tag">Testimonios</div>
+      <h2 class="section-title">Lo que dicen nuestros <em>clientes</em></h2>
+    </div>
+    <div class="testimonials-grid fade-in">
+      <div class="testi-card">
+        <div class="stars">★★★★★</div>
+        <blockquote>«La verdad es que tengo solo feedback positivo. Estamos contentos con el software. Cada vez que hemos tenido una dificultad técnica, se ha solucionado de manera rápida y expedita.»</blockquote>
+        <div class="testi-author"><div class="author-avatar">MG</div><div><div class="author-name">Dra. María González</div><div class="author-role">Directora, Clínica Norte</div></div></div>
+      </div>
+      <div class="testi-card">
+        <div class="stars">★★★★★</div>
+        <blockquote>«TuCita nos ha apoyado desde la creación de la clínica. Ha ido creciendo junto con nosotros, implementando nuevas funciones que permiten un mejor manejo de pacientes y financiero.»</blockquote>
+        <div class="testi-author"><div class="author-avatar">CR</div><div><div class="author-name">Carlos Ruiz</div><div class="author-role">Gerente, Centro Médico Sur</div></div></div>
+      </div>
+      <div class="testi-card">
+        <div class="stars">★★★★★</div>
+        <blockquote>«Un sistema muy fácil de usar. Lo conocí en el centro médico donde trabajo y cuando me independicé decidí contratarlo. Lo recomiendo totalmente a cualquier profesional de la salud.»</blockquote>
+        <div class="testi-author"><div class="author-avatar">VP</div><div><div class="author-name">Valentina Pérez</div><div class="author-role">Psicóloga independiente</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA SECTION -->
+<section>
+  <div class="section-inner">
+    <div class="cta-banner fade-in">
+      <h2>¿Listo para digitalizar tu centro de salud?</h2>
+      <p>Únete a más de 5.000 centros que ya confían en TuCita. Empieza gratis hoy.</p>
+      <div class="cta-input-group">
+        <input class="cta-input" type="email" placeholder="Tu correo electrónico" id="cta-email">
+        <button class="btn-accent" onclick="ctaSignup()">Empezar gratis →</button>
+      </div>
+      <p style="margin-top:1rem;font-size:0.82rem;opacity:0.6;">Sin tarjeta de crédito · 14 días gratis · Cancela cuando quieras</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="#" class="logo">
+        <div class="logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></div>
+        TuCita
+      </a>
+      <p>Software de gestión integral para centros de salud y estética. Agenda, ficha clínica, finanzas y más.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Producto</h4>
+      <ul>
+        <li><a href="#">Funciones</a></li>
+        <li><a href="#">Precios</a></li>
+        <li><a href="#">Integraciones</a></li>
+        <li><a href="#">Novedades</a></li>
+        <li><a href="#">Roadmap</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Clientes</h4>
+      <ul>
+        <li><a href="#">Centros médicos</a></li>
+        <li><a href="#">Médicos independientes</a></li>
+        <li><a href="#">Centros de estética</a></li>
+        <li><a href="#">Psicólogos</a></li>
+        <li><a href="#">Nutriólogos</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Empresa</h4>
+      <ul>
+        <li><a href="#">Acerca de</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Contacto</a></li>
+        <li><a href="#">Privacidad</a></li>
+        <li><a href="#">Términos</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 TuCita. Todos los derechos reservados.</span>
+    <span>Hecho con ❤️ en Chile 🇨🇱 · <a href="admin.html" style="color:rgba(255,255,255,0.2);text-decoration:none;font-size:0.75rem;" title="Admin">⚙</a></span>
+  </div>
+</footer>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-login">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('login')">×</button>
+    <div class="modal-form">
+      <h2>Iniciar sesión</h2>
+      <p>Bienvenido de vuelta a TuCita</p>
+      <div class="form-group"><label>Email</label><input type="email" placeholder="tu@email.com"></div>
+      <div class="form-group"><label>Contraseña</label><input type="password" placeholder="••••••••"></div>
+      <button id="btn-login" class="btn-primary" style="width:100%;padding:0.85rem;font-size:1rem;border-radius:12px;padding-right:2.5rem;">Ingresar</button>
+      <p style="text-align:center;margin-top:1rem;font-size:0.9rem;color:var(--gray);">¿No tienes cuenta? <a href="#" style="color:var(--primary)" onclick="closeModal('login');openModal('register');return false;">Regístrate gratis</a></p>
+    </div>
+    <div class="success-screen">
+      <div class="success-icon">🎉</div>
+      <h3></h3><p></p>
+      <button class="btn-primary" style="padding:0.7rem 2rem;border-radius:12px;" onclick="closeModal('login')">Ir a mi panel →</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-register">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('register')">×</button>
+    <div class="modal-form">
+      <h2>Empieza gratis</h2>
+      <p>14 días sin tarjeta de crédito</p>
+      <div class="form-row">
+        <div class="form-group"><label>Nombre</label><input type="text" placeholder="Tu nombre"></div>
+        <div class="form-group"><label>Apellido</label><input type="text" placeholder="Apellido"></div>
+      </div>
+      <div class="form-group"><label>Email</label><input type="email" placeholder="tu@email.com"></div>
+      <div class="form-group"><label>Teléfono</label><input type="tel" placeholder="+56 9 xxxx xxxx"></div>
+      <div class="form-group"><label>Tipo de centro</label>
+        <select>
+          <option>Centro Médico</option>
+          <option>Médico independiente</option>
+          <option>Centro de estética</option>
+          <option>Peluquería / Barbería</option>
+          <option>Spa / Bienestar</option>
+          <option>Otro</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Contraseña</label><input type="password" placeholder="Mínimo 8 caracteres"></div>
+      <button id="btn-register" class="btn-accent" style="width:100%;border-radius:12px;padding-right:2.5rem;">Crear cuenta gratuita →</button>
+      <p style="text-align:center;margin-top:1rem;font-size:0.82rem;color:var(--gray);">Al registrarte aceptas nuestros <a href="#" style="color:var(--primary)">Términos</a> y <a href="#" style="color:var(--primary)">Privacidad</a></p>
+    </div>
+    <div class="success-screen">
+      <div class="success-icon">✅</div>
+      <h3></h3><p></p>
+      <button class="btn-accent" style="border-radius:12px;padding:0.7rem 2rem;" onclick="closeModal('register')">Comenzar mi prueba gratis →</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-demo">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('demo')">×</button>
+    <div class="modal-form">
+      <h2>Ver demo</h2>
+      <p>Agenda una demostración personalizada con uno de nuestros expertos</p>
+      <div class="form-group"><label>Nombre completo</label><input type="text" placeholder="Tu nombre"></div>
+      <div class="form-group"><label>Email corporativo</label><input type="email" placeholder="tu@empresa.com"></div>
+      <div class="form-group"><label>Teléfono</label><input type="tel" placeholder="+56 9 xxxx xxxx"></div>
+      <div class="form-group"><label>Tamaño del centro</label>
+        <select>
+          <option>Solo yo (independiente)</option>
+          <option>2–5 profesionales</option>
+          <option>6–15 profesionales</option>
+          <option>+15 profesionales</option>
+        </select>
+      </div>
+      <button id="btn-demo" class="btn-primary" style="width:100%;padding:0.85rem;font-size:1rem;border-radius:12px;padding-right:2.5rem;">Agendar demo →</button>
+    </div>
+    <div class="success-screen">
+      <div class="success-icon">📅</div>
+      <h3></h3><p></p>
+      <button class="btn-primary" style="padding:0.7rem 2rem;border-radius:12px;" onclick="closeModal('demo')">Entendido</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* TOAST */
+  .toast {
+    position:fixed; bottom:32px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:#0d1320; color:#fff; padding:14px 24px;
+    border-radius:14px; font-size:0.95rem; font-weight:500;
+    z-index:99999; opacity:0; pointer-events:none;
+    transition:opacity 0.3s, transform 0.3s;
+    display:flex; align-items:center; gap:10px;
+    box-shadow:0 8px 30px rgba(0,0,0,0.25);
+    white-space:nowrap;
+  }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+  .toast.success { border-left:4px solid #00c98d; }
+  .toast.error   { border-left:4px solid #ef4444; }
+  .toast.info    { border-left:4px solid #1a56e8; }
+
+  /* SUCCESS SCREEN inside modal */
+  .success-screen {
+    display:none; text-align:center; padding:1rem 0;
+  }
+  .success-screen.show { display:block; }
+  .success-icon {
+    width:72px; height:72px; background:#f0fdf4;
+    border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:2rem; margin:0 auto 1.2rem;
+    animation:popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+  }
+  @keyframes popIn { from{transform:scale(0)}to{transform:scale(1)} }
+  .success-screen h3 { font-size:1.4rem; font-weight:800; margin-bottom:0.5rem; }
+  .success-screen p  { color:var(--gray); font-size:0.95rem; margin-bottom:1.5rem; }
+
+  /* Loading spinner on button */
+  .btn-loading { position:relative; pointer-events:none; opacity:0.85; }
+  .btn-loading::after {
+    content:'';
+    position:absolute; right:14px; top:50%; transform:translateY(-50%);
+    width:16px; height:16px;
+    border:2px solid rgba(255,255,255,0.4);
+    border-top-color:#fff;
+    border-radius:50%;
+    animation:spin 0.7s linear infinite;
+  }
+  @keyframes spin { to{transform:translateY(-50%) rotate(360deg)} }
+
+  /* Nav active link */
+  .nav-links a.active-link { color:var(--primary); font-weight:700; }
+
+  /* Booking confirmed */
+  .booking-confirmed {
+    display:none; text-align:center; padding:2rem 0;
+  }
+  .booking-confirmed.show { display:block; }
+</style>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  /* ─── TOAST ─── */
+  function showToast(msg, type='success', duration=3500) {
+    const t = document.getElementById('toast');
+    const icons = { success:'✅', error:'❌', info:'ℹ️' };
+    t.className = `toast ${type}`;
+    t.innerHTML = `<span>${icons[type]}</span><span>${msg}</span>`;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove('show'), duration);
+  }
+
+  /* ─── MODALS ─── */
+  function openModal(name) {
+    document.getElementById('modal-' + name).classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal(name) {
+    const overlay = document.getElementById('modal-' + name);
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+    // reset success screens after close animation
+    setTimeout(() => {
+      overlay.querySelectorAll('.success-screen').forEach(s => s.classList.remove('show'));
+      overlay.querySelectorAll('.modal-form').forEach(f => f.style.display = '');
+    }, 300);
+  }
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', function(e) {
+      if (e.target === this) {
+        const id = this.id.replace('modal-', '');
+        closeModal(id);
+      }
+    });
+  });
+
+  /* ─── FORM VALIDATION ─── */
+  function validateInputs(inputs) {
+    let valid = true;
+    inputs.forEach(inp => {
+      inp.style.borderColor = '';
+      if (!inp.value.trim()) {
+        inp.style.borderColor = '#ef4444';
+        valid = false;
+      }
+      if (inp.type === 'email' && inp.value && !inp.value.includes('@')) {
+        inp.style.borderColor = '#ef4444';
+        valid = false;
+      }
+    });
+    return valid;
+  }
+
+  function btnLoading(btn, loading) {
+    if (loading) { btn.classList.add('btn-loading'); btn.disabled = true; }
+    else          { btn.classList.remove('btn-loading'); btn.disabled = false; }
+  }
+
+  function showSuccess(modal, title, msg) {
+    modal.querySelector('.modal-form').style.display = 'none';
+    const s = modal.querySelector('.success-screen');
+    s.querySelector('h3').textContent = title;
+    s.querySelector('p').textContent  = msg;
+    s.classList.add('show');
+  }
+
+  /* ─── TRACKING DB ─── */
+  const TDB = {
+    push: (k,item) => {
+      try {
+        const a = JSON.parse(localStorage.getItem('tc_'+k)||'[]');
+        a.push(item);
+        localStorage.setItem('tc_'+k, JSON.stringify(a));
+      } catch(e){}
+    }
+  };
+
+  /* ─── LOGIN ─── */
+  document.getElementById('btn-login').addEventListener('click', function() {
+    const modal = document.getElementById('modal-login');
+    const inputs = modal.querySelectorAll('input');
+    if (!validateInputs(inputs)) { showToast('Completa todos los campos', 'error'); return; }
+    btnLoading(this, true);
+    setTimeout(() => {
+      btnLoading(this, false);
+      showSuccess(modal, '¡Bienvenido de vuelta!', 'Redirigiendo a tu panel TuCita...');
+      showToast('Sesión iniciada correctamente');
+    }, 1400);
+  });
+
+  /* ─── REGISTER ─── */
+  document.getElementById('btn-register').addEventListener('click', function() {
+    const modal = document.getElementById('modal-register');
+    const inputs = modal.querySelectorAll('input');
+    if (!validateInputs(inputs)) { showToast('Completa todos los campos requeridos', 'error'); return; }
+    btnLoading(this, true);
+    // Save to admin DB
+    const inps = modal.querySelectorAll('input');
+    TDB.push('registers', {
+      id: Date.now(), date: new Date().toISOString(), status:'new',
+      nombre: inps[0]?.value, apellido: inps[1]?.value,
+      email: inps[2]?.value, telefono: inps[3]?.value,
+      tipoCentro: modal.querySelector('select')?.value,
+    });
+    setTimeout(() => {
+      btnLoading(this, false);
+      showSuccess(modal, '¡Cuenta creada con éxito!', 'Te enviamos un email de confirmación. Tu prueba gratuita de 14 días ya comenzó.');
+      showToast('Cuenta creada — revisa tu email');
+    }, 1600);
+  });
+
+  /* ─── DEMO ─── */
+  document.getElementById('btn-demo').addEventListener('click', function() {
+    const modal = document.getElementById('modal-demo');
+    const inputs = modal.querySelectorAll('input');
+    if (!validateInputs(inputs)) { showToast('Completa todos los campos', 'error'); return; }
+    btnLoading(this, true);
+    const inps = modal.querySelectorAll('input');
+    TDB.push('demos', {
+      id: Date.now(), date: new Date().toISOString(), status:'new',
+      nombre: inps[0]?.value, email: inps[1]?.value,
+      telefono: inps[2]?.value,
+      tamano: modal.querySelector('select')?.value,
+    });
+    setTimeout(() => {
+      btnLoading(this, false);
+      showSuccess(modal, '¡Demo agendada!', 'Un especialista TuCita te contactará en menos de 24 horas hábiles.');
+      showToast('Demo agendada exitosamente');
+    }, 1500);
+  });
+
+  /* ─── BOOKING WIDGET ─── */
+  document.getElementById('btn-booking').addEventListener('click', function() {
+    const widget = document.getElementById('booking-widget');
+    const especialidad = widget.querySelector('select').value;
+    const profesional  = widget.querySelectorAll('select')[1].value;
+    const fecha        = widget.querySelector('input[type=date]').value;
+    if (!fecha) { showToast('Selecciona una fecha', 'error'); return; }
+    btnLoading(this, true);
+    setTimeout(() => {
+      btnLoading(this, false);
+      document.getElementById('booking-form').style.display = 'none';
+      document.getElementById('booking-success').classList.add('show');
+      document.getElementById('booking-summary').innerHTML =
+        `<strong>${especialidad}</strong> con <strong>${profesional}</strong><br>📅 ${fecha}`;
+      showToast('¡Hora confirmada! Revisa tu email', 'success');
+    }, 1800);
+  });
+  document.getElementById('btn-booking-reset').addEventListener('click', function() {
+    document.getElementById('booking-form').style.display = '';
+    document.getElementById('booking-success').classList.remove('show');
+  });
+
+  /* ─── CTA EMAIL ─── */
+  function ctaSignup() {
+    const emailInput = document.getElementById('cta-email');
+    if (!emailInput.value.trim() || !emailInput.value.includes('@')) {
+      emailInput.style.border = '2px solid #ef4444';
+      showToast('Ingresa un email válido', 'error');
+      return;
+    }
+    emailInput.style.border = '';
+    TDB.push('info', { id:Date.now(), date:new Date().toISOString(), status:'new', email:emailInput.value, nombre:'(CTA)', tipoCentro:'—', telefono:'—' });
+    openModal('register');
+  }
+
+  /* ─── TABS ─── */
+  function switchTab(tab, clickedBtn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    clickedBtn.classList.add('active');
+    document.getElementById('tab-' + tab).classList.add('active');
+  }
+
+  /* ─── ACTIVE NAV LINK on scroll ─── */
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(sec => {
+      if (window.scrollY >= sec.offsetTop - 100) current = sec.id;
+    });
+    navLinks.forEach(a => {
+      a.classList.toggle('active-link', a.getAttribute('href') === '#' + current);
+    });
+  });
+
+  /* ─── SCROLL ANIMATIONS ─── */
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+  /* ─── CALENDAR NAV ─── */
+  const months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  let calMonth = 2, calYear = 2026; // March 2026
+  function renderCalHeader() {
+    document.querySelector('.cal-header h4').textContent = `${months[calMonth]} ${calYear}`;
+  }
+  document.querySelectorAll('.cal-nav button')[0].addEventListener('click', () => {
+    calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; }
+    renderCalHeader();
+  });
+  document.querySelectorAll('.cal-nav button')[1].addEventListener('click', () => {
+    calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; }
+    renderCalHeader();
+  });
+
+  /* ─── CAL DAYS CLICK ─── */
+  document.querySelectorAll('.cal-day:not(.header)').forEach(day => {
+    day.addEventListener('click', function() {
+      document.querySelectorAll('.cal-day.active').forEach(d => {
+        d.classList.remove('active');
+        if (!d.classList.contains('today')) d.style.background = '';
+      });
+      this.classList.add('active');
+    });
+  });
+
+  /* ─── INTEGRATION PILLS ─── */
+  document.querySelectorAll('.integration-pill').forEach(pill => {
+    pill.addEventListener('click', function() {
+      showToast(`Integración con ${this.textContent.trim()} disponible en el plan Profesional`, 'info');
+    });
+  });
+
+  /* ─── PRICING BUTTONS ─── */
+  document.querySelectorAll('.btn-outline, .btn-white').forEach(btn => {
+    if (btn.closest('.price-card')) {
+      btn.addEventListener('click', function() {
+        const planName = this.closest('.price-card').querySelector('.price-name').textContent;
+        if (planName === 'Enterprise') {
+          openModal('demo');
+        } else {
+          openModal('register');
+        }
+      });
+    }
+  });
+</script>
+</body>
+</html>
