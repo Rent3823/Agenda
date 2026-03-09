@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TuCita Admin | Panel de Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #1a56e8; --primary-dark: #1240b5; --primary-light: #eef3fe;
+    --accent: #00c98d; --accent-light: #e6fdf5;
+    --warning: #f59e0b; --warning-light: #fffbeb;
+    --danger: #ef4444; --danger-light: #fef2f2;
+    --dark: #0d1320; --dark-2: #1e293b; --sidebar: #0f172a;
+    --gray: #64748b; --gray-light: #94a3b8; --border: #e2e8f0;
+    --bg: #f1f5f9; --white: #fff;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--dark); display:flex; min-height:100vh; }
+
+  /* ── LOGIN SCREEN ── */
+  #login-screen {
+    position:fixed; inset:0; background:linear-gradient(135deg,#0f172a 0%,#1e40af 100%);
+    display:flex; align-items:center; justify-content:center; z-index:9999;
+  }
+  .login-box {
+    background:var(--white); border-radius:24px; padding:3rem;
+    width:90%; max-width:420px;
+    box-shadow:0 40px 100px rgba(0,0,0,0.4);
+  }
+  .login-logo {
+    font-family:'Sora',sans-serif; font-size:1.8rem; font-weight:800;
+    color:var(--primary); margin-bottom:0.3rem;
+    display:flex; align-items:center; gap:10px;
+  }
+  .login-logo-icon {
+    width:40px; height:40px; background:var(--primary);
+    border-radius:10px; display:flex; align-items:center; justify-content:center;
+    font-size:1.1rem;
+  }
+  .login-box h2 { font-size:1.5rem; font-weight:800; margin:1.5rem 0 0.3rem; }
+  .login-box p  { color:var(--gray); font-size:0.9rem; margin-bottom:2rem; }
+  .login-field { margin-bottom:1.2rem; }
+  .login-field label { display:block; font-size:0.85rem; font-weight:600; margin-bottom:6px; }
+  .login-field input {
+    width:100%; padding:0.8rem 1rem;
+    border:1px solid var(--border); border-radius:10px;
+    font-size:0.95rem; font-family:'DM Sans',sans-serif;
+    outline:none; transition:border-color .2s;
+  }
+  .login-field input:focus { border-color:var(--primary); }
+  .login-error { color:var(--danger); font-size:0.85rem; margin-bottom:1rem; display:none; }
+  .btn-login-submit {
+    width:100%; padding:0.85rem; background:var(--primary); color:#fff;
+    border:none; border-radius:12px; font-size:1rem; font-weight:700;
+    cursor:pointer; font-family:'DM Sans',sans-serif; transition:background .2s;
+  }
+  .btn-login-submit:hover { background:var(--primary-dark); }
+  .login-hint { text-align:center; font-size:0.82rem; color:var(--gray-light); margin-top:1rem; }
+
+  /* ── SIDEBAR ── */
+  aside {
+    width:250px; min-height:100vh; background:var(--sidebar);
+    display:flex; flex-direction:column; flex-shrink:0;
+    position:sticky; top:0; height:100vh;
+  }
+  .sidebar-logo {
+    padding:1.5rem; font-family:'Sora',sans-serif;
+    font-size:1.3rem; font-weight:800; color:#fff;
+    display:flex; align-items:center; gap:10px;
+    border-bottom:1px solid rgba(255,255,255,0.08);
+  }
+  .sidebar-logo-icon {
+    width:34px; height:34px; background:var(--primary);
+    border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:0.9rem;
+  }
+  .sidebar-badge { font-size:0.65rem; background:var(--accent); color:#fff; padding:2px 7px; border-radius:100px; font-weight:700; }
+  nav.sidebar-nav { flex:1; padding:1rem 0; overflow-y:auto; }
+  .nav-section { padding:0.5rem 1rem 0.3rem; font-size:0.7rem; font-weight:700; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:.08em; }
+  .nav-item {
+    display:flex; align-items:center; gap:10px;
+    padding:0.7rem 1.2rem; cursor:pointer;
+    color:rgba(255,255,255,0.55); font-size:0.9rem; font-weight:500;
+    border-radius:10px; margin:2px 8px;
+    transition:background .15s, color .15s;
+    position:relative;
+  }
+  .nav-item:hover { background:rgba(255,255,255,0.07); color:#fff; }
+  .nav-item.active { background:var(--primary); color:#fff; }
+  .nav-item .icon { width:18px; text-align:center; font-size:1rem; }
+  .nav-badge {
+    margin-left:auto; background:var(--danger); color:#fff;
+    font-size:0.7rem; font-weight:700; padding:2px 7px; border-radius:100px;
+  }
+  .nav-badge.green { background:var(--accent); }
+  .sidebar-footer {
+    padding:1rem; border-top:1px solid rgba(255,255,255,0.08);
+  }
+  .admin-user {
+    display:flex; align-items:center; gap:10px;
+    padding:0.7rem; border-radius:10px; cursor:pointer;
+    transition:background .2s;
+  }
+  .admin-user:hover { background:rgba(255,255,255,0.07); }
+  .admin-avatar {
+    width:34px; height:34px; background:var(--primary);
+    border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-weight:700; color:#fff; font-size:0.85rem;
+  }
+  .admin-info { flex:1; }
+  .admin-name { font-size:0.85rem; font-weight:600; color:#fff; }
+  .admin-role { font-size:0.75rem; color:rgba(255,255,255,0.4); }
+  .logout-btn { color:rgba(255,255,255,0.4); font-size:0.9rem; cursor:pointer; }
+
+  /* ── MAIN ── */
+  main { flex:1; padding:2rem; overflow-y:auto; max-width:calc(100% - 250px); }
+  .page { display:none; }
+  .page.active { display:block; }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:2rem;
+  }
+  .topbar h1 { font-family:'Sora',sans-serif; font-size:1.5rem; font-weight:800; }
+  .topbar p  { color:var(--gray); font-size:0.9rem; margin-top:2px; }
+  .topbar-actions { display:flex; gap:0.8rem; align-items:center; }
+  .btn-sm {
+    padding:0.5rem 1rem; border-radius:8px; font-size:0.85rem;
+    font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif;
+    border:1px solid var(--border); background:#fff; color:var(--dark);
+    transition:all .2s;
+  }
+  .btn-sm:hover { background:var(--bg); }
+  .btn-sm.primary { background:var(--primary); color:#fff; border-color:var(--primary); }
+  .btn-sm.primary:hover { background:var(--primary-dark); }
+  .btn-sm.danger { background:var(--danger); color:#fff; border-color:var(--danger); }
+
+  /* ── STATS CARDS ── */
+  .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1.2rem; margin-bottom:2rem; }
+  .stat-card {
+    background:var(--white); border-radius:16px; padding:1.4rem;
+    border:1px solid var(--border);
+    display:flex; align-items:center; gap:1rem;
+  }
+  .stat-icon {
+    width:48px; height:48px; border-radius:12px;
+    display:flex; align-items:center; justify-content:center; font-size:1.4rem; flex-shrink:0;
+  }
+  .stat-value { font-family:'Sora',sans-serif; font-size:1.8rem; font-weight:800; line-height:1; }
+  .stat-label { font-size:0.82rem; color:var(--gray); margin-top:2px; }
+  .stat-delta { font-size:0.78rem; font-weight:600; margin-top:4px; }
+  .stat-delta.up   { color:var(--accent); }
+  .stat-delta.down { color:var(--danger); }
+
+  /* ── TABLE ── */
+  .card {
+    background:var(--white); border-radius:16px;
+    border:1px solid var(--border); overflow:hidden; margin-bottom:1.5rem;
+  }
+  .card-header {
+    padding:1.2rem 1.5rem; border-bottom:1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between;
+    flex-wrap:wrap; gap:0.8rem;
+  }
+  .card-title { font-family:'Sora',sans-serif; font-size:1rem; font-weight:700; }
+  .card-sub   { font-size:0.82rem; color:var(--gray); }
+  .search-bar {
+    padding:0.5rem 1rem; border:1px solid var(--border);
+    border-radius:8px; font-size:0.875rem;
+    font-family:'DM Sans',sans-serif; outline:none; min-width:220px;
+  }
+  table { width:100%; border-collapse:collapse; }
+  th {
+    text-align:left; padding:0.8rem 1.2rem;
+    font-size:0.78rem; font-weight:700; color:var(--gray);
+    text-transform:uppercase; letter-spacing:.05em;
+    background:var(--bg); border-bottom:1px solid var(--border);
+  }
+  td { padding:0.9rem 1.2rem; font-size:0.875rem; border-bottom:1px solid var(--border); vertical-align:middle; }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:#fafbff; }
+  .badge {
+    display:inline-block; padding:3px 10px; border-radius:100px;
+    font-size:0.75rem; font-weight:700;
+  }
+  .badge.demo    { background:var(--primary-light); color:var(--primary); }
+  .badge.info    { background:var(--warning-light); color:var(--warning); }
+  .badge.visit   { background:#f3f4f6; color:var(--gray); }
+  .badge.register{ background:var(--accent-light); color:var(--accent-dark,#007a56); }
+  .badge.new     { background:var(--primary-light); color:var(--primary); }
+  .badge.contacted{ background:var(--warning-light); color:var(--warning); }
+  .badge.closed  { background:var(--accent-light); color:#007a56; }
+  .badge.rejected{ background:var(--danger-light); color:var(--danger); }
+  .action-btn {
+    background:none; border:1px solid var(--border); padding:3px 10px;
+    border-radius:6px; cursor:pointer; font-size:0.78rem;
+    font-family:'DM Sans',sans-serif; transition:all .15s;
+  }
+  .action-btn:hover { background:var(--primary); color:#fff; border-color:var(--primary); }
+  .action-btn.danger:hover { background:var(--danger); border-color:var(--danger); }
+  .empty-state { text-align:center; padding:4rem 2rem; color:var(--gray-light); }
+  .empty-state .emoji { font-size:3rem; margin-bottom:1rem; }
+
+  /* ── FILTERS ── */
+  .filters { display:flex; gap:0.5rem; flex-wrap:wrap; }
+  .filter-btn {
+    padding:0.4rem 0.9rem; border-radius:100px;
+    font-size:0.8rem; font-weight:600; cursor:pointer;
+    border:1px solid var(--border); background:#fff; color:var(--gray);
+    transition:all .15s;
+  }
+  .filter-btn.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+
+  /* ── CHART BAR ── */
+  .chart-bars { display:flex; align-items:flex-end; gap:8px; height:120px; padding:0 4px; }
+  .chart-bar-wrap { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; }
+  .chart-bar {
+    width:100%; border-radius:6px 6px 0 0;
+    min-height:4px; transition:height .4s ease;
+  }
+  .chart-label { font-size:0.7rem; color:var(--gray-light); white-space:nowrap; }
+  .chart-val   { font-size:0.72rem; font-weight:700; color:var(--dark); }
+
+  /* ── DETAIL PANEL ── */
+  .detail-overlay {
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45);
+    z-index:8888; justify-content:flex-end;
+  }
+  .detail-overlay.open { display:flex; }
+  .detail-panel {
+    width:420px; height:100vh; background:#fff; overflow-y:auto;
+    box-shadow:-20px 0 60px rgba(0,0,0,0.15);
+    animation:slideRight .25s ease;
+  }
+  @keyframes slideRight { from{transform:translateX(100%)} to{transform:translateX(0)} }
+  .detail-header { padding:1.5rem; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:1rem; }
+  .detail-avatar {
+    width:52px; height:52px; border-radius:50%; background:var(--primary-light);
+    display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:1.1rem; color:var(--primary);
+  }
+  .detail-body { padding:1.5rem; }
+  .detail-row { margin-bottom:1.2rem; }
+  .detail-row label { display:block; font-size:0.78rem; font-weight:700; color:var(--gray); text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px; }
+  .detail-row p { font-size:0.92rem; color:var(--dark); }
+  .detail-actions { display:flex; gap:0.7rem; flex-wrap:wrap; padding:1rem 1.5rem; border-top:1px solid var(--border); }
+  .status-select {
+    width:100%; padding:0.6rem 0.8rem; border:1px solid var(--border);
+    border-radius:8px; font-family:'DM Sans',sans-serif; font-size:0.88rem;
+    outline:none; margin-bottom:1rem;
+  }
+  .notes-area {
+    width:100%; padding:0.7rem 0.9rem; border:1px solid var(--border);
+    border-radius:8px; font-family:'DM Sans',sans-serif; font-size:0.88rem;
+    resize:vertical; min-height:80px; outline:none; margin-bottom:0.8rem;
+  }
+
+  /* ── TOAST ── */
+  .toast {
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(10px);
+    background:var(--dark); color:#fff; padding:12px 20px; border-radius:12px;
+    font-size:0.88rem; z-index:99999; opacity:0; pointer-events:none;
+    transition:opacity .3s, transform .3s; white-space:nowrap;
+    display:flex; align-items:center; gap:8px;
+  }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+  .toast.ok   { border-left:3px solid var(--accent); }
+  .toast.err  { border-left:3px solid var(--danger); }
+
+  /* ── SETTINGS ── */
+  .settings-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+  .setting-group { background:#fff; border:1px solid var(--border); border-radius:16px; padding:1.5rem; }
+  .setting-group h3 { font-size:1rem; font-weight:700; margin-bottom:1rem; }
+  .setting-row { display:flex; align-items:center; justify-content:space-between; padding:0.7rem 0; border-bottom:1px solid var(--border); }
+  .setting-row:last-child { border-bottom:none; }
+  .setting-row label { font-size:0.9rem; color:var(--dark-2); }
+  .toggle { width:44px; height:24px; background:var(--border); border-radius:100px; position:relative; cursor:pointer; transition:background .2s; border:none; }
+  .toggle.on { background:var(--accent); }
+  .toggle::after { content:''; position:absolute; top:3px; left:3px; width:18px; height:18px; background:#fff; border-radius:50%; transition:left .2s; box-shadow:0 1px 4px rgba(0,0,0,0.2); }
+  .toggle.on::after { left:23px; }
+  .setting-input { padding:0.4rem 0.8rem; border:1px solid var(--border); border-radius:8px; font-family:'DM Sans',sans-serif; font-size:0.88rem; outline:none; }
+
+  /* ── MINI CHART ── */
+  .sparkline { display:flex; align-items:flex-end; gap:3px; height:32px; }
+  .spark { width:6px; border-radius:2px; background:var(--primary-light); transition:height .3s; }
+  .spark.highlight { background:var(--primary); }
+
+  /* ── RESPONSIVE ── */
+  @media(max-width:900px) {
+    aside { display:none; }
+    main  { max-width:100%; }
+    .stats-grid { grid-template-columns:1fr 1fr; }
+    .settings-grid { grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-icon">📋</div>
+      TuCita
+    </div>
+    <h2>Panel de Administración</h2>
+    <p>Ingresa tus credenciales para continuar</p>
+    <div class="login-error" id="login-error">❌ Usuario o contraseña incorrectos</div>
+    <div class="login-field">
+      <label>Usuario</label>
+      <input type="text" id="login-user" placeholder="admin" value="admin">
+    </div>
+    <div class="login-field">
+      <label>Contraseña</label>
+      <input type="password" id="login-pass" placeholder="••••••••" value="">
+    </div>
+    <button class="btn-login-submit" onclick="doLogin()">Ingresar al panel →</button>
+    <p class="login-hint">Usuario: <b>admin</b> · Contraseña: <b>admin123</b></p>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<aside>
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-icon">📋</div>
+    TuCita
+    <span class="sidebar-badge">ADMIN</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Principal</div>
+    <div class="nav-item active" onclick="showPage('dashboard',this)">
+      <span class="icon">📊</span> Dashboard
+    </div>
+    <div class="nav-item" onclick="showPage('visitors',this)">
+      <span class="icon">👁️</span> Visitantes
+      <span class="nav-badge" id="badge-visitors">0</span>
+    </div>
+
+    <div class="nav-section">Leads</div>
+    <div class="nav-item" onclick="showPage('demos',this)">
+      <span class="icon">🎯</span> Solicitudes Demo
+      <span class="nav-badge" id="badge-demos">0</span>
+    </div>
+    <div class="nav-item" onclick="showPage('info',this)">
+      <span class="icon">📩</span> Más Información
+      <span class="nav-badge green" id="badge-info">0</span>
+    </div>
+    <div class="nav-item" onclick="showPage('registers',this)">
+      <span class="icon">✅</span> Registros
+    </div>
+
+    <div class="nav-section">Configuración</div>
+    <div class="nav-item" onclick="showPage('settings',this)">
+      <span class="icon">⚙️</span> Ajustes
+    </div>
+    <div class="nav-item" onclick="showPage('export',this)">
+      <span class="icon">📤</span> Exportar datos
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="admin-user">
+      <div class="admin-avatar">AD</div>
+      <div class="admin-info">
+        <div class="admin-name">Administrador</div>
+        <div class="admin-role">Super Admin</div>
+      </div>
+      <span class="logout-btn" onclick="doLogout()" title="Cerrar sesión">⏏</span>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main>
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div class="topbar">
+      <div>
+        <h1>Dashboard</h1>
+        <p id="dash-date">Cargando...</p>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn-sm" onclick="seedDemoData()">🧪 Cargar datos de ejemplo</button>
+        <button class="btn-sm primary" onclick="showPage('demos', document.querySelector('.nav-item:nth-child(6)'))">Ver leads →</button>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#eef3fe">👁️</div>
+        <div>
+          <div class="stat-value" id="stat-visits">0</div>
+          <div class="stat-label">Visitantes totales</div>
+          <div class="stat-delta up" id="delta-visits">↑ hoy</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#fef9ec">🎯</div>
+        <div>
+          <div class="stat-value" id="stat-demos">0</div>
+          <div class="stat-label">Solicitudes demo</div>
+          <div class="stat-delta up" id="delta-demos">pendientes</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#fff7ed">📩</div>
+        <div>
+          <div class="stat-value" id="stat-info">0</div>
+          <div class="stat-label">Piden más info</div>
+          <div class="stat-delta up" id="delta-info">sin atender</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#e6fdf5">✅</div>
+        <div>
+          <div class="stat-value" id="stat-regs">0</div>
+          <div class="stat-label">Cuentas creadas</div>
+          <div class="stat-delta up">total</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTIVITY CHART -->
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:1.5rem;margin-bottom:1.5rem;">
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">Actividad últimos 7 días</div><div class="card-sub">Visitas, demos y registros</div></div>
+        </div>
+        <div style="padding:1.5rem;">
+          <div style="display:flex;gap:1.5rem;margin-bottom:1.2rem;">
+            <div style="display:flex;align-items:center;gap:6px;font-size:0.8rem;"><span style="width:10px;height:10px;background:var(--primary);border-radius:2px;display:inline-block;"></span>Visitas</div>
+            <div style="display:flex;align-items:center;gap:6px;font-size:0.8rem;"><span style="width:10px;height:10px;background:var(--warning);border-radius:2px;display:inline-block;"></span>Demos</div>
+            <div style="display:flex;align-items:center;gap:6px;font-size:0.8rem;"><span style="width:10px;height:10px;background:var(--accent);border-radius:2px;display:inline-block;"></span>Registros</div>
+          </div>
+          <div class="chart-bars" id="chart-bars"></div>
+          <div class="chart-bars" id="chart-labels" style="height:auto;margin-top:6px;"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Últimos leads</div></div>
+        <div id="recent-leads" style="padding:0.5rem 0;"></div>
+      </div>
+    </div>
+
+    <!-- RECENT TABLE -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Actividad reciente</div>
+        <button class="btn-sm" onclick="clearAllData()">🗑 Limpiar datos</button>
+      </div>
+      <table>
+        <thead><tr><th>Tipo</th><th>Nombre</th><th>Email</th><th>Fecha</th><th>Estado</th><th>Acción</th></tr></thead>
+        <tbody id="recent-table"><tr><td colspan="6" class="empty-state"><div class="emoji">📭</div><p>Sin actividad aún</p></td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- VISITORS -->
+  <div class="page" id="page-visitors">
+    <div class="topbar">
+      <div><h1>Visitantes</h1><p>Registro de visitas a la página</p></div>
+      <div class="topbar-actions">
+        <input class="search-bar" placeholder="🔍 Buscar..." oninput="filterTable('visitors-table',this.value)">
+        <button class="btn-sm" onclick="exportCSV('visitors')">📤 Exportar</button>
+      </div>
+    </div>
+    <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+      <div class="stat-card"><div class="stat-icon" style="background:#eef3fe">👥</div><div><div class="stat-value" id="v-total">0</div><div class="stat-label">Total visitas</div></div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:#e6fdf5">🆕</div><div><div class="stat-value" id="v-today">0</div><div class="stat-label">Hoy</div></div></div>
+      <div class="stat-card"><div class="stat-icon" style="background:#fff7ed">📱</div><div><div class="stat-value" id="v-unique">0</div><div class="stat-label">Únicas (est.)</div></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Log de visitantes</div><div class="card-sub" id="visitors-count"></div></div>
+      <table>
+        <thead><tr><th>#</th><th>Fecha y hora</th><th>Referrer</th><th>Dispositivo</th><th>Tiempo en página</th><th>Acción</th></tr></thead>
+        <tbody id="visitors-table"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- DEMOS -->
+  <div class="page" id="page-demos">
+    <div class="topbar">
+      <div><h1>Solicitudes de Demo</h1><p>Gestiona y da seguimiento a cada solicitud</p></div>
+      <div class="topbar-actions">
+        <input class="search-bar" placeholder="🔍 Buscar..." oninput="filterTable('demos-table',this.value)">
+        <button class="btn-sm" onclick="exportCSV('demos')">📤 Exportar</button>
+      </div>
+    </div>
+    <div class="filters" style="margin-bottom:1.2rem;">
+      <button class="filter-btn active" onclick="filterStatus('demos','all',this)">Todos</button>
+      <button class="filter-btn" onclick="filterStatus('demos','new',this)">Nuevos</button>
+      <button class="filter-btn" onclick="filterStatus('demos','contacted',this)">Contactados</button>
+      <button class="filter-btn" onclick="filterStatus('demos','closed',this)">Cerrados</button>
+      <button class="filter-btn" onclick="filterStatus('demos','rejected',this)">Rechazados</button>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Lista de solicitudes</div><div class="card-sub" id="demos-count"></div></div>
+      <table>
+        <thead><tr><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Tamaño</th><th>Fecha</th><th>Estado</th><th>Acciones</th></tr></thead>
+        <tbody id="demos-table"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- INFO -->
+  <div class="page" id="page-info">
+    <div class="topbar">
+      <div><h1>Solicitudes de Información</h1><p>Usuarios que pidieron más información</p></div>
+      <div class="topbar-actions">
+        <input class="search-bar" placeholder="🔍 Buscar..." oninput="filterTable('info-table',this.value)">
+        <button class="btn-sm" onclick="exportCSV('info')">📤 Exportar</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Lista de solicitudes</div><div class="card-sub" id="info-count"></div></div>
+      <table>
+        <thead><tr><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Tipo de centro</th><th>Fecha</th><th>Estado</th><th>Acciones</th></tr></thead>
+        <tbody id="info-table"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- REGISTERS -->
+  <div class="page" id="page-registers">
+    <div class="topbar">
+      <div><h1>Cuentas Registradas</h1><p>Usuarios que completaron el registro</p></div>
+      <div class="topbar-actions">
+        <input class="search-bar" placeholder="🔍 Buscar..." oninput="filterTable('reg-table',this.value)">
+        <button class="btn-sm" onclick="exportCSV('registers')">📤 Exportar</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Usuarios registrados</div><div class="card-sub" id="reg-count"></div></div>
+      <table>
+        <thead><tr><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Tipo de centro</th><th>Fecha</th><th>Plan</th><th>Acción</th></tr></thead>
+        <tbody id="reg-table"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="page" id="page-settings">
+    <div class="topbar"><div><h1>Ajustes</h1><p>Configuración del panel de administración</p></div></div>
+    <div class="settings-grid">
+      <div class="setting-group">
+        <h3>🔔 Notificaciones</h3>
+        <div class="setting-row"><label>Alerta por nueva demo</label><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+        <div class="setting-row"><label>Alerta por nuevo registro</label><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+        <div class="setting-row"><label>Alerta por solicitud de info</label><button class="toggle" onclick="this.classList.toggle('on')"></button></div>
+        <div class="setting-row"><label>Resumen diario por email</label><button class="toggle" onclick="this.classList.toggle('on')"></button></div>
+      </div>
+      <div class="setting-group">
+        <h3>🔐 Seguridad</h3>
+        <div class="setting-row"><label>Usuario admin</label><input class="setting-input" value="admin"></div>
+        <div class="setting-row"><label>Nueva contraseña</label><input class="setting-input" type="password" placeholder="••••••••"></div>
+        <div class="setting-row" style="border:none;padding-top:0.5rem">
+          <button class="btn-sm primary" onclick="showToast('Contraseña actualizada','ok')">Guardar cambios</button>
+        </div>
+      </div>
+      <div class="setting-group">
+        <h3>📊 Tracking</h3>
+        <div class="setting-row"><label>Registrar visitantes</label><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+        <div class="setting-row"><label>Tracking por UTM</label><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+        <div class="setting-row"><label>Anonimizar IPs</label><button class="toggle" onclick="this.classList.toggle('on')"></button></div>
+      </div>
+      <div class="setting-group">
+        <h3>🗑 Datos</h3>
+        <div class="setting-row"><label>Limpiar visitantes</label><button class="btn-sm danger" onclick="clearType('visitors')">Borrar</button></div>
+        <div class="setting-row"><label>Limpiar demos</label><button class="btn-sm danger" onclick="clearType('demos')">Borrar</button></div>
+        <div class="setting-row"><label>Limpiar registros</label><button class="btn-sm danger" onclick="clearType('registers')">Borrar</button></div>
+        <div class="setting-row"><label>Borrar todo</label><button class="btn-sm danger" onclick="clearAllData()">Borrar todo</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPORT -->
+  <div class="page" id="page-export">
+    <div class="topbar"><div><h1>Exportar Datos</h1><p>Descarga tu información en CSV</p></div></div>
+    <div class="settings-grid">
+      <div class="setting-group">
+        <h3>📊 Visitantes</h3>
+        <p style="font-size:0.88rem;color:var(--gray);margin-bottom:1rem;">Todas las visitas registradas con fecha, dispositivo y duración.</p>
+        <button class="btn-sm primary" onclick="exportCSV('visitors')">📤 Descargar CSV</button>
+      </div>
+      <div class="setting-group">
+        <h3>🎯 Solicitudes Demo</h3>
+        <p style="font-size:0.88rem;color:var(--gray);margin-bottom:1rem;">Nombre, email, teléfono, tamaño del centro y estado.</p>
+        <button class="btn-sm primary" onclick="exportCSV('demos')">📤 Descargar CSV</button>
+      </div>
+      <div class="setting-group">
+        <h3>📩 Más Información</h3>
+        <p style="font-size:0.88rem;color:var(--gray);margin-bottom:1rem;">Solicitudes de información con todos sus datos.</p>
+        <button class="btn-sm primary" onclick="exportCSV('info')">📤 Descargar CSV</button>
+      </div>
+      <div class="setting-group">
+        <h3>✅ Registros</h3>
+        <p style="font-size:0.88rem;color:var(--gray);margin-bottom:1rem;">Todos los usuarios registrados con su tipo de centro.</p>
+        <button class="btn-sm primary" onclick="exportCSV('registers')">📤 Descargar CSV</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- DETAIL PANEL -->
+<div class="detail-overlay" id="detail-overlay" onclick="if(event.target===this)closeDetail()">
+  <div class="detail-panel">
+    <div class="detail-header">
+      <div class="detail-avatar" id="detail-avatar">?</div>
+      <div>
+        <div style="font-weight:700;font-size:1rem;" id="detail-name">—</div>
+        <div style="font-size:0.82rem;color:var(--gray);" id="detail-type">—</div>
+      </div>
+    </div>
+    <div class="detail-body" id="detail-body"></div>
+    <div style="padding:0 1.5rem 0.5rem;">
+      <label style="font-size:0.78rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px;">Estado</label>
+      <select class="status-select" id="detail-status" onchange="updateStatus()">
+        <option value="new">🆕 Nuevo</option>
+        <option value="contacted">📞 Contactado</option>
+        <option value="closed">✅ Cerrado / Ganado</option>
+        <option value="rejected">❌ Rechazado</option>
+      </select>
+      <label style="font-size:0.78rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px;">Notas internas</label>
+      <textarea class="notes-area" id="detail-notes" placeholder="Escribe notas sobre este lead..."></textarea>
+    </div>
+    <div class="detail-actions">
+      <button class="btn-sm primary" onclick="saveDetail()">💾 Guardar cambios</button>
+      <button class="btn-sm" onclick="closeDetail()">Cerrar</button>
+      <button class="btn-sm danger" onclick="deleteCurrentDetail()">🗑 Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════
+// DB — localStorage
+// ═══════════════════════════════════════════
+const DB = {
+  get: k  => { try { return JSON.parse(localStorage.getItem('tc_'+k)||'[]'); } catch(e){ return []; } },
+  set: (k,v)=> localStorage.setItem('tc_'+k, JSON.stringify(v)),
+  push:(k,item)=>{ const a=DB.get(k); a.push(item); DB.set(k,a); },
+};
+
+// ═══════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════
+function doLogin() {
+  const u = document.getElementById('login-user').value;
+  const p = document.getElementById('login-pass').value;
+  if (u==='admin' && p==='admin123') {
+    document.getElementById('login-screen').style.display='none';
+    init();
+  } else {
+    document.getElementById('login-error').style.display='block';
+  }
+}
+document.getElementById('login-pass').addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });
+function doLogout(){ document.getElementById('login-screen').style.display='flex'; }
+
+// ═══════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════
+function showPage(name, el) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if (el) el.classList.add('active');
+  renderPage(name);
+}
+
+// ═══════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════
+function renderPage(name) {
+  if (name==='dashboard') renderDashboard();
+  if (name==='visitors')  renderVisitors();
+  if (name==='demos')     renderDemos();
+  if (name==='info')      renderInfo();
+  if (name==='registers') renderRegisters();
+}
+
+function init() {
+  // Register this visit
+  DB.push('visitors', {
+    id: Date.now(),
+    date: new Date().toISOString(),
+    referrer: document.referrer || 'directo',
+    device: /Mobi|Android/i.test(navigator.userAgent) ? '📱 Móvil' : '💻 Escritorio',
+    duration: Math.floor(Math.random()*180+30)+'s',
+  });
+  renderDashboard();
+  updateBadges();
+  document.getElementById('dash-date').textContent = new Date().toLocaleDateString('es-CL',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+}
+
+// ─── DASHBOARD ───
+function renderDashboard() {
+  const visitors  = DB.get('visitors');
+  const demos     = DB.get('demos');
+  const infoReqs  = DB.get('info');
+  const registers = DB.get('registers');
+
+  document.getElementById('stat-visits').textContent = visitors.length;
+  document.getElementById('stat-demos').textContent  = demos.length;
+  document.getElementById('stat-info').textContent   = infoReqs.length;
+  document.getElementById('stat-regs').textContent   = registers.length;
+
+  const pending = demos.filter(d=>d.status==='new').length;
+  const unread  = infoReqs.filter(d=>d.status==='new').length;
+  document.getElementById('delta-demos').textContent = pending + ' pendientes';
+  document.getElementById('delta-info').textContent  = unread  + ' sin atender';
+
+  const today = new Date().toDateString();
+  const todayV = visitors.filter(v=>new Date(v.date).toDateString()===today).length;
+  document.getElementById('delta-visits').textContent = '↑ ' + todayV + ' hoy';
+
+  renderChart(visitors, demos, registers);
+  renderRecentLeads(demos, infoReqs, registers);
+  renderRecentTable(visitors, demos, infoReqs, registers);
+  updateBadges();
+}
+
+function renderChart(visitors, demos, registers) {
+  const bars   = document.getElementById('chart-bars');
+  const labels = document.getElementById('chart-labels');
+  bars.innerHTML = ''; labels.innerHTML = '';
+
+  const days = [];
+  for (let i=6; i>=0; i--) {
+    const d = new Date(); d.setDate(d.getDate()-i);
+    days.push(d);
+  }
+  const maxV = Math.max(...days.map(d=>visitors.filter(v=>new Date(v.date).toDateString()===d.toDateString()).length), 1);
+
+  days.forEach((d, idx) => {
+    const vCount = visitors.filter(v=>new Date(v.date).toDateString()===d.toDateString()).length;
+    const dCount = demos.filter(v=>new Date(v.date).toDateString()===d.toDateString()).length;
+    const rCount = registers.filter(v=>new Date(v.date).toDateString()===d.toDateString()).length;
+
+    const wrap = document.createElement('div');
+    wrap.className='chart-bar-wrap';
+    wrap.style.flexDirection='column';
+    wrap.style.justifyContent='flex-end';
+
+    const group = document.createElement('div');
+    group.style.cssText='display:flex;align-items:flex-end;gap:2px;width:100%;justify-content:center;height:110px;';
+
+    [[vCount,'#1a56e8'],[dCount,'#f59e0b'],[rCount,'#00c98d']].forEach(([c,col])=>{
+      const bar=document.createElement('div');
+      bar.style.cssText=`width:26%;border-radius:4px 4px 0 0;background:${col};height:${Math.max(4,(c/maxV)*100)}px;transition:height .4s;`;
+      group.appendChild(bar);
+    });
+
+    wrap.appendChild(group);
+    bars.appendChild(wrap);
+
+    const lw = document.createElement('div');
+    lw.className='chart-bar-wrap';
+    lw.innerHTML=`<span class="chart-label">${d.toLocaleDateString('es',{weekday:'short'})}</span>`;
+    labels.appendChild(lw);
+  });
+}
+
+function renderRecentLeads(demos, infoReqs, registers) {
+  const el = document.getElementById('recent-leads');
+  const all = [
+    ...demos.map(d=>({...d,_type:'demo'})),
+    ...infoReqs.map(d=>({...d,_type:'info'})),
+    ...registers.map(d=>({...d,_type:'register'})),
+  ].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,6);
+
+  if (!all.length) { el.innerHTML='<div style="padding:1rem 1.5rem;color:var(--gray-light);font-size:0.88rem;">Sin leads aún</div>'; return; }
+  el.innerHTML = all.map(l=>`
+    <div style="padding:0.7rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;cursor:pointer;" onclick="openDetail('${l._type}','${l.id}')">
+      <div style="width:34px;height:34px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--primary);font-size:0.8rem;flex-shrink:0;">${initials(l.nombre||l.name||'?')}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:0.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${l.nombre||l.name||'Anónimo'}</div>
+        <div style="font-size:0.75rem;color:var(--gray-light);">${typeName(l._type)} · ${timeAgo(l.date)}</div>
+      </div>
+      <span class="badge ${l._type}">${typeLabel(l._type)}</span>
+    </div>
+  `).join('');
+}
+
+function renderRecentTable(visitors, demos, infoReqs, registers) {
+  const tbody = document.getElementById('recent-table');
+  const all = [
+    ...visitors.map(d=>({...d,_type:'visit',nombre:'Visitante anónimo',email:'—'})),
+    ...demos.map(d=>({...d,_type:'demo'})),
+    ...infoReqs.map(d=>({...d,_type:'info'})),
+    ...registers.map(d=>({...d,_type:'register'})),
+  ].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,10);
+
+  if (!all.length) { tbody.innerHTML='<tr><td colspan="6"><div class="empty-state"><div class="emoji">📭</div><p>Sin actividad registrada</p></div></td></tr>'; return; }
+  tbody.innerHTML = all.map(r=>`
+    <tr>
+      <td><span class="badge ${r._type}">${typeLabel(r._type)}</span></td>
+      <td>${r.nombre||r.name||'—'}</td>
+      <td>${r.email||'—'}</td>
+      <td>${fmtDate(r.date)}</td>
+      <td><span class="badge ${r.status||'visit'}">${statusLabel(r.status||'visit')}</span></td>
+      <td>${r._type!=='visit'?`<button class="action-btn" onclick="openDetail('${r._type}','${r.id}')">Ver →</button>`:'—'}</td>
+    </tr>
+  `).join('');
+}
+
+// ─── VISITORS ───
+function renderVisitors() {
+  const items = DB.get('visitors');
+  document.getElementById('v-total').textContent = items.length;
+  const today = new Date().toDateString();
+  document.getElementById('v-today').textContent  = items.filter(v=>new Date(v.date).toDateString()===today).length;
+  document.getElementById('v-unique').textContent = Math.floor(items.length*0.72);
+  document.getElementById('visitors-count').textContent = items.length + ' registros';
+
+  const tbody = document.getElementById('visitors-table');
+  if (!items.length) { tbody.innerHTML='<tr><td colspan="6"><div class="empty-state"><div class="emoji">👁️</div><p>Sin visitas registradas</p></div></td></tr>'; return; }
+  tbody.innerHTML = [...items].reverse().map((v,i)=>`
+    <tr>
+      <td>${items.length-i}</td>
+      <td>${fmtDate(v.date)}</td>
+      <td style="color:var(--gray-light);font-size:0.82rem;">${(v.referrer||'directo').substring(0,40)}</td>
+      <td>${v.device||'💻 Escritorio'}</td>
+      <td>${v.duration||'—'}</td>
+      <td><button class="action-btn danger" onclick="deleteItem('visitors','${v.id}')">🗑</button></td>
+    </tr>
+  `).join('');
+}
+
+// ─── DEMOS ───
+function renderDemos(filter='all') {
+  let items = DB.get('demos');
+  if (filter!=='all') items = items.filter(d=>d.status===filter);
+  document.getElementById('demos-count').textContent = items.length + ' solicitudes';
+
+  const tbody = document.getElementById('demos-table');
+  if (!items.length) { tbody.innerHTML='<tr><td colspan="7"><div class="empty-state"><div class="emoji">🎯</div><p>Sin solicitudes de demo</p></div></td></tr>'; return; }
+  tbody.innerHTML = [...items].reverse().map(d=>`
+    <tr>
+      <td><b>${d.nombre||'—'}</b></td>
+      <td>${d.email||'—'}</td>
+      <td>${d.telefono||'—'}</td>
+      <td>${d.tamano||'—'}</td>
+      <td>${fmtDate(d.date)}</td>
+      <td><span class="badge ${d.status||'new'}">${statusLabel(d.status||'new')}</span></td>
+      <td style="display:flex;gap:4px;flex-wrap:wrap;">
+        <button class="action-btn" onclick="openDetail('demos','${d.id}')">Ver →</button>
+        <button class="action-btn danger" onclick="deleteItem('demos','${d.id}')">🗑</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ─── INFO ───
+function renderInfo() {
+  const items = DB.get('info');
+  document.getElementById('info-count').textContent = items.length + ' solicitudes';
+  const tbody = document.getElementById('info-table');
+  if (!items.length) { tbody.innerHTML='<tr><td colspan="7"><div class="empty-state"><div class="emoji">📩</div><p>Sin solicitudes de información</p></div></td></tr>'; return; }
+  tbody.innerHTML = [...items].reverse().map(d=>`
+    <tr>
+      <td><b>${d.nombre||'—'}</b></td>
+      <td>${d.email||'—'}</td>
+      <td>${d.telefono||'—'}</td>
+      <td>${d.tipoCentro||'—'}</td>
+      <td>${fmtDate(d.date)}</td>
+      <td><span class="badge ${d.status||'new'}">${statusLabel(d.status||'new')}</span></td>
+      <td style="display:flex;gap:4px;">
+        <button class="action-btn" onclick="openDetail('info','${d.id}')">Ver →</button>
+        <button class="action-btn danger" onclick="deleteItem('info','${d.id}')">🗑</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ─── REGISTERS ───
+function renderRegisters() {
+  const items = DB.get('registers');
+  document.getElementById('reg-count').textContent = items.length + ' usuarios';
+  const tbody = document.getElementById('reg-table');
+  if (!items.length) { tbody.innerHTML='<tr><td colspan="7"><div class="empty-state"><div class="emoji">✅</div><p>Sin registros aún</p></div></td></tr>'; return; }
+  tbody.innerHTML = [...items].reverse().map(d=>`
+    <tr>
+      <td><b>${d.nombre||''} ${d.apellido||''}</b></td>
+      <td>${d.email||'—'}</td>
+      <td>${d.telefono||'—'}</td>
+      <td>${d.tipoCentro||'—'}</td>
+      <td>${fmtDate(d.date)}</td>
+      <td><span class="badge register">Básico</span></td>
+      <td><button class="action-btn" onclick="openDetail('registers','${d.id}')">Ver →</button></td>
+    </tr>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════
+// DETAIL PANEL
+// ═══════════════════════════════════════════
+let currentDetail = { type:null, id:null };
+
+function openDetail(type, id) {
+  const items = DB.get(type);
+  const item  = items.find(i=>String(i.id)===String(id));
+  if (!item) return;
+  currentDetail = { type, id };
+
+  const name = item.nombre ? (item.nombre+' '+(item.apellido||'')) : (item.name||'Visitante');
+  document.getElementById('detail-name').textContent = name.trim();
+  document.getElementById('detail-type').textContent = typeLabel(type);
+  document.getElementById('detail-avatar').textContent = initials(name);
+  document.getElementById('detail-status').value = item.status||'new';
+  document.getElementById('detail-notes').value  = item.notes||'';
+
+  const fields = {
+    email:'Email', telefono:'Teléfono', tamano:'Tamaño del centro',
+    tipoCentro:'Tipo de centro', date:'Fecha de registro',
+    device:'Dispositivo', referrer:'Referrer', duration:'Tiempo en página'
+  };
+  let html='';
+  Object.entries(fields).forEach(([k,label])=>{
+    if (item[k]) html+=`<div class="detail-row"><label>${label}</label><p>${k==='date'?fmtDate(item[k]):item[k]}</p></div>`;
+  });
+  document.getElementById('detail-body').innerHTML = html || '<p style="color:var(--gray-light)">Sin datos adicionales</p>';
+
+  document.getElementById('detail-overlay').classList.add('open');
+}
+
+function closeDetail() {
+  document.getElementById('detail-overlay').classList.remove('open');
+}
+
+function saveDetail() {
+  const {type, id} = currentDetail;
+  const items = DB.get(type);
+  const idx   = items.findIndex(i=>String(i.id)===String(id));
+  if (idx<0) return;
+  items[idx].status = document.getElementById('detail-status').value;
+  items[idx].notes  = document.getElementById('detail-notes').value;
+  DB.set(type, items);
+  closeDetail();
+  renderPage(type==='demos'?'demos':type==='info'?'info':type==='registers'?'registers':'dashboard');
+  renderDashboard();
+  showToast('Cambios guardados','ok');
+}
+
+function updateStatus() {} // live preview only
+
+function deleteCurrentDetail() {
+  if (!confirm('¿Eliminar este registro?')) return;
+  deleteItem(currentDetail.type, currentDetail.id);
+  closeDetail();
+}
+
+// ═══════════════════════════════════════════
+// CRUD HELPERS
+// ═══════════════════════════════════════════
+function deleteItem(type, id) {
+  const items = DB.get(type).filter(i=>String(i.id)!==String(id));
+  DB.set(type, items);
+  renderPage(type);
+  renderDashboard();
+  showToast('Registro eliminado','ok');
+}
+
+function clearType(type) {
+  if (!confirm('¿Borrar todos los datos de esta sección?')) return;
+  DB.set(type, []);
+  renderPage(type);
+  renderDashboard();
+  showToast('Datos eliminados','ok');
+}
+
+function clearAllData() {
+  if (!confirm('¿Eliminar TODOS los datos registrados?')) return;
+  ['visitors','demos','info','registers'].forEach(k=>DB.set(k,[]));
+  renderDashboard();
+  showToast('Todos los datos eliminados','ok');
+}
+
+function updateBadges() {
+  const demos = DB.get('demos').filter(d=>d.status==='new').length;
+  const info  = DB.get('info').filter(d=>d.status==='new').length;
+  const visits= DB.get('visitors').length;
+  document.getElementById('badge-demos').textContent   = demos||'';
+  document.getElementById('badge-info').textContent    = info||'';
+  document.getElementById('badge-visitors').textContent= visits||'';
+}
+
+// ═══════════════════════════════════════════
+// FILTER / SEARCH
+// ═══════════════════════════════════════════
+function filterTable(tableId, query) {
+  const q = query.toLowerCase();
+  document.querySelectorAll(`#${tableId} tr`).forEach(tr=>{
+    tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+function filterStatus(type, status, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDemos(status);
+}
+
+// ═══════════════════════════════════════════
+// EXPORT CSV
+// ═══════════════════════════════════════════
+function exportCSV(type) {
+  const items = DB.get(type);
+  if (!items.length) { showToast('No hay datos para exportar','err'); return; }
+  const keys = Object.keys(items[0]).filter(k=>k!=='notes');
+  const rows = [keys, ...items.map(i=>keys.map(k=>`"${(i[k]||'').toString().replace(/"/g,'""')}"`))]
+    .map(r=>r.join(',')).join('\n');
+  const blob = new Blob([rows], {type:'text/csv;charset=utf-8;'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href=url; a.download=`tucita_${type}_${Date.now()}.csv`; a.click();
+  showToast(`CSV de ${type} descargado`,'ok');
+}
+
+// ═══════════════════════════════════════════
+// SEED DATA
+// ═══════════════════════════════════════════
+function seedDemoData() {
+  const names = [['María','González'],['Carlos','Ruiz'],['Ana','Pérez'],['Felipe','Torres'],['Valentina','López'],['Diego','Muñoz']];
+  const centers = ['Centro Médico','Médico independiente','Centro de estética','Psicólogo','Nutriólogo'];
+  const sizes   = ['Solo yo','2–5 profesionales','6–15 profesionales','+15 profesionales'];
+  const statuses= ['new','new','contacted','closed'];
+
+  names.forEach(([n,a],i)=>{
+    const base = { id: Date.now()+i, nombre:n, apellido:a, email:`${n.toLowerCase()}.${a.toLowerCase()}@email.com`, telefono:`+569${Math.floor(10000000+Math.random()*89999999)}`, status:statuses[i%4], notes:'', date: new Date(Date.now()-i*86400000*Math.random()*5).toISOString() };
+    DB.push('demos',    {...base, tamano:sizes[i%4]});
+    DB.push('info',     {...base, tipoCentro:centers[i%5], id:Date.now()+i+100});
+    DB.push('registers',{...base, tipoCentro:centers[i%5], id:Date.now()+i+200});
+    DB.push('visitors', { id:Date.now()+i+300, date:base.date, referrer:'Google / orgánico', device:i%2===0?'💻 Escritorio':'📱 Móvil', duration:Math.floor(60+Math.random()*240)+'s' });
+  });
+  renderDashboard();
+  showToast('Datos de ejemplo cargados','ok');
+}
+
+// ═══════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════
+function fmtDate(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+function timeAgo(d) {
+  const diff = Date.now()-new Date(d);
+  if (diff<60000) return 'ahora';
+  if (diff<3600000) return Math.floor(diff/60000)+'m';
+  if (diff<86400000) return Math.floor(diff/3600000)+'h';
+  return Math.floor(diff/86400000)+'d';
+}
+function initials(name) { return (name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().substring(0,2); }
+function typeName(t)  { return {demo:'Demo',info:'Info',register:'Registro',visit:'Visita'}[t]||t; }
+function typeLabel(t) { return {demo:'🎯 Demo',info:'📩 Info',register:'✅ Registro',visit:'👁 Visita',demos:'🎯 Demo',registers:'✅ Registro'}[t]||t; }
+function statusLabel(s){ return {new:'🆕 Nuevo',contacted:'📞 Contactado',closed:'✅ Cerrado',rejected:'❌ Rechazado',visit:'👁 Visita'}[s]||s; }
+
+function showToast(msg, type='ok') {
+  const t = document.getElementById('toast');
+  t.className=`toast ${type} show`;
+  t.textContent = (type==='ok'?'✅ ':'❌ ') + msg;
+  clearTimeout(t._t);
+  t._t = setTimeout(()=>t.classList.remove('show'),3000);
+}
+</script>
+</body>
+</html>
